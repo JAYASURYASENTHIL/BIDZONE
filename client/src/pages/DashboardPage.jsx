@@ -92,7 +92,7 @@ export default function DashboardPage() {
         <div className={styles.infoStrip}>
           <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Account ID</span>
-            <span className={styles.infoValue}>{user?._id?.slice(-8)?.toUpperCase()}</span>
+            <span className={styles.infoValue}>{user?._id?.slice(-12)?.toUpperCase()}</span>
           </div>
           <div className={styles.infoDivider} />
           <div className={styles.infoItem}>

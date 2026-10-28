@@ -37,6 +37,12 @@ Thumbs.db
 .idea/
 
 # ============================
+# Uploads
+# ============================
+server/uploads/*
+!server/uploads/.gitkeep
+
+# ============================
 # Vite
 # ============================
 client/.vite/

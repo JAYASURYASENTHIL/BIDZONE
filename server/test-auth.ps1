@@ -1,169 +1,250 @@
-# BIDZONE Auth API Test Suite
-# Run from: C:\Users\jayas\Desktop\bidding\server
-# Requires server running on http://localhost:5000
+# BIDZONE Auth API Test Suite (ASCII-safe, no Unicode dashes)
+# Usage: Start server first, then run: .\test-auth.ps1
+# Server must be running on http://localhost:5000
 
-$BASE = "http://localhost:5000"
-$session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
-$passed = 0
-$failed = 0
+$BASE    = "http://localhost:5000"
+$passed  = 0
+$failed  = 0
+# Use timestamp-based email so re-runs never collide with existing DB data
+$ts      = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+$EMAIL   = "test.student.$ts@kongu.edu"
+$PASS    = "Test1234"
+$NAME    = "Test Student"
 
-function Test-Case {
-  param($name, $expected, $actual, $body = $null)
-  if ($actual -eq $expected) {
-    Write-Host "  PASS  $name" -ForegroundColor Green
+function Pass($label) {
+    Write-Host "  PASS  $label" -ForegroundColor Green
     $script:passed++
-  } else {
-    Write-Host "  FAIL  $name (expected $expected, got $actual)" -ForegroundColor Red
-    if ($body) { Write-Host "        Body: $body" -ForegroundColor DarkYellow }
+}
+function Fail($label, $extra = "") {
+    Write-Host "  FAIL  $label $extra" -ForegroundColor Red
     $script:failed++
-  }
+}
+function Check($label, $expected, $actual) {
+    if ("$actual" -eq "$expected") { Pass $label }
+    else { Fail $label "(expected '$expected', got '$actual')" }
 }
 
-Write-Host "`n=== BIDZONE Auth Test Suite ===" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "=== BIDZONE Auth Test Suite ===" -ForegroundColor Cyan
+Write-Host "    Test email: $EMAIL"
+Write-Host ""
 
-# ── T1: Health check ──────────────────────────────────────────────────────────
-Write-Host "`n[T1] Health check"
+# ------------------------------------------------------------------
+# T1: Health check
+# ------------------------------------------------------------------
+Write-Host "[T1] Health check"
 try {
-  $r = Invoke-WebRequest -Uri "$BASE/" -Method GET -UseBasicParsing
-  $j = $r.Content | ConvertFrom-Json
-  Test-Case "Status 200"   200    $r.StatusCode
-  Test-Case "success=true" $true  $j.success
-} catch { Write-Host "  FAIL  Exception: $($_.Exception.Message)" -ForegroundColor Red; $failed++ }
-
-# ── T2: Signup success ────────────────────────────────────────────────────────
-Write-Host "`n[T2] Signup — success"
-$signupBody = '{"name":"Test Student","email":"test.student@kongu.edu","password":"Test1234"}'
-try {
-  $r = Invoke-WebRequest -Uri "$BASE/api/auth/signup" -Method POST `
-       -ContentType "application/json" -Body $signupBody `
-       -WebSession $session -UseBasicParsing
-  $j = $r.Content | ConvertFrom-Json
-  Test-Case "Status 201"          201   $r.StatusCode
-  Test-Case "success=true"        $true $j.success
-  Test-Case "Has user._id"        $true ($null -ne $j.user._id)
-  Test-Case "Has user.email"      $true ($null -ne $j.user.email)
-  Test-Case "No passwordHash"     $true ($null -eq $j.user.passwordHash)
-  Test-Case "No password field"   $true ($null -eq $j.user.password)
-  $hasCookie = ($session.Cookies.GetCookies("$BASE") | Where-Object { $_.Name -eq "campus.sid" }).Count -gt 0
-  Test-Case "Session cookie set"  $true $hasCookie
+    $r = Invoke-WebRequest -Uri "$BASE/" -Method GET -UseBasicParsing
+    $j = $r.Content | ConvertFrom-Json
+    Check "Status 200"   "200"  $r.StatusCode
+    Check "success=true" "True" $j.success
 } catch {
-  $status = $_.Exception.Response.StatusCode.value__
-  Write-Host "  FAIL  Exception (HTTP $status): $($_.Exception.Message)" -ForegroundColor Red; $failed++
+    Fail "T1 exception" $_.Exception.Message
 }
 
-# ── T3: Duplicate signup ──────────────────────────────────────────────────────
-Write-Host "`n[T3] Signup — duplicate email"
+# ------------------------------------------------------------------
+# T2: Signup - success
+# ------------------------------------------------------------------
+Write-Host ""
+Write-Host "[T2] Signup -- success"
+$signupSession = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+$signupBody    = "{`"name`":`"$NAME`",`"email`":`"$EMAIL`",`"password`":`"$PASS`"}"
 try {
-  $r = Invoke-WebRequest -Uri "$BASE/api/auth/signup" -Method POST `
-       -ContentType "application/json" -Body $signupBody -UseBasicParsing
-  Test-Case "Status 409" 409 $r.StatusCode
+    $r = Invoke-WebRequest -Uri "$BASE/api/auth/signup" -Method POST `
+         -ContentType "application/json" -Body $signupBody `
+         -WebSession $signupSession -UseBasicParsing
+    $j = $r.Content | ConvertFrom-Json
+    Check "Status 201"           "201"  $r.StatusCode
+    Check "success=true"         "True" $j.success
+    Check "Has user._id"         "True" ($null -ne $j.user._id)
+    Check "No passwordHash"      "True" ($null -eq $j.user.passwordHash)
+    Check "No password field"    "True" ($null -eq $j.user.password)
+    $cookie = $signupSession.Cookies.GetCookies($BASE) | Where-Object { $_.Name -eq "campus.sid" }
+    Check "Session cookie set"   "True" ($cookie.Count -gt 0)
 } catch {
-  $status = $_.Exception.Response.StatusCode.value__
-  Test-Case "Status 409" 409 $status
+    $status = $_.Exception.Response.StatusCode.value__
+    $body   = $_.ErrorDetails.Message
+    Fail "T2 exception (HTTP $status)" $body
 }
 
-# ── T4: Signup — weak password ────────────────────────────────────────────────
-Write-Host "`n[T4] Signup — weak password (validation)"
-$weakBody = '{"name":"Bad User","email":"bad@kongu.edu","password":"weak"}'
+# ------------------------------------------------------------------
+# T3: Signup - duplicate email (must return 409)
+# ------------------------------------------------------------------
+Write-Host ""
+Write-Host "[T3] Signup -- duplicate email (expect 409)"
 try {
-  $r = Invoke-WebRequest -Uri "$BASE/api/auth/signup" -Method POST `
-       -ContentType "application/json" -Body $weakBody -UseBasicParsing
-  Test-Case "Status 422" 422 $r.StatusCode
+    $r = Invoke-WebRequest -Uri "$BASE/api/auth/signup" -Method POST `
+         -ContentType "application/json" -Body $signupBody -UseBasicParsing
+    Fail "T3 should have returned 409 but got $($r.StatusCode)"
 } catch {
-  $status = $_.Exception.Response.StatusCode.value__
-  Test-Case "Status 422" 422 $status
+    $status = $_.Exception.Response.StatusCode.value__
+    $body   = $_.ErrorDetails.Message
+    Check "Status 409" "409" $status
+    if ($body) {
+        $j = $body | ConvertFrom-Json
+        Write-Host "        Body: $($j.message)" -ForegroundColor DarkGray
+    }
 }
 
-# ── T5: Login — success ───────────────────────────────────────────────────────
-Write-Host "`n[T5] Login — success"
+# ------------------------------------------------------------------
+# T4: Signup - validation failure (weak password)
+# ------------------------------------------------------------------
+Write-Host ""
+Write-Host "[T4] Signup -- weak password (expect 422)"
+$weakBody = '{"name":"Bad","email":"bad@kongu.edu","password":"weak"}'
+try {
+    $r = Invoke-WebRequest -Uri "$BASE/api/auth/signup" -Method POST `
+         -ContentType "application/json" -Body $weakBody -UseBasicParsing
+    Fail "T4 should have returned 422 but got $($r.StatusCode)"
+} catch {
+    $status = $_.Exception.Response.StatusCode.value__
+    $body   = $_.ErrorDetails.Message
+    Check "Status 422" "422" $status
+    if ($body) {
+        $j = $body | ConvertFrom-Json
+        Write-Host "        Validation msg: $($j.message)" -ForegroundColor DarkGray
+    }
+}
+
+# ------------------------------------------------------------------
+# T5: Login - success
+# ------------------------------------------------------------------
+Write-Host ""
+Write-Host "[T5] Login -- success"
 $loginSession = New-Object Microsoft.PowerShell.Commands.WebRequestSession
-$loginBody = '{"email":"test.student@kongu.edu","password":"Test1234"}'
+$loginBody    = "{`"email`":`"$EMAIL`",`"password`":`"$PASS`"}"
 try {
-  $r = Invoke-WebRequest -Uri "$BASE/api/auth/login" -Method POST `
-       -ContentType "application/json" -Body $loginBody `
-       -WebSession $loginSession -UseBasicParsing
-  $j = $r.Content | ConvertFrom-Json
-  Test-Case "Status 200"        200   $r.StatusCode
-  Test-Case "success=true"      $true $j.success
-  Test-Case "No passwordHash"   $true ($null -eq $j.user.passwordHash)
-  Test-Case "No password field" $true ($null -eq $j.user.password)
-  $hasCookie = ($loginSession.Cookies.GetCookies("$BASE") | Where-Object { $_.Name -eq "campus.sid" }).Count -gt 0
-  Test-Case "Session cookie set" $true $hasCookie
-} catch { Write-Host "  FAIL  Exception: $($_.Exception.Message)" -ForegroundColor Red; $failed++ }
-
-# ── T6: Login — wrong password ────────────────────────────────────────────────
-Write-Host "`n[T6] Login — wrong password (generic error)"
-$badPassBody = '{"email":"test.student@kongu.edu","password":"WrongPass1"}'
-try {
-  $r = Invoke-WebRequest -Uri "$BASE/api/auth/login" -Method POST `
-       -ContentType "application/json" -Body $badPassBody -UseBasicParsing
-  Test-Case "Status 401" 401 $r.StatusCode
+    $r = Invoke-WebRequest -Uri "$BASE/api/auth/login" -Method POST `
+         -ContentType "application/json" -Body $loginBody `
+         -WebSession $loginSession -UseBasicParsing
+    $j = $r.Content | ConvertFrom-Json
+    Check "Status 200"         "200"  $r.StatusCode
+    Check "success=true"       "True" $j.success
+    Check "No passwordHash"    "True" ($null -eq $j.user.passwordHash)
+    Check "No password field"  "True" ($null -eq $j.user.password)
+    $cookie = $loginSession.Cookies.GetCookies($BASE) | Where-Object { $_.Name -eq "campus.sid" }
+    Check "Session cookie set" "True" ($cookie.Count -gt 0)
 } catch {
-  $status = $_.Exception.Response.StatusCode.value__
-  $body   = $_.ErrorDetails.Message
-  Test-Case "Status 401" 401 $status
-  $j = $body | ConvertFrom-Json
-  Test-Case "Generic error message" "Invalid email or password." $j.message
+    $status = $_.Exception.Response.StatusCode.value__
+    $body   = $_.ErrorDetails.Message
+    Fail "T5 exception (HTTP $status)" $body
 }
 
-# ── T7: Login — nonexistent email ─────────────────────────────────────────────
-Write-Host "`n[T7] Login — nonexistent email (generic error)"
-$noUserBody = '{"email":"ghost@kongu.edu","password":"Test1234"}'
+# ------------------------------------------------------------------
+# T6: Login - wrong password (must return 401, generic message)
+# ------------------------------------------------------------------
+Write-Host ""
+Write-Host "[T6] Login -- wrong password (expect 401 generic)"
+$badBody = "{`"email`":`"$EMAIL`",`"password`":`"WrongPass1`"}"
 try {
-  $r = Invoke-WebRequest -Uri "$BASE/api/auth/login" -Method POST `
-       -ContentType "application/json" -Body $noUserBody -UseBasicParsing
-  Test-Case "Status 401" 401 $r.StatusCode
+    $r = Invoke-WebRequest -Uri "$BASE/api/auth/login" -Method POST `
+         -ContentType "application/json" -Body $badBody -UseBasicParsing
+    Fail "T6 should have returned 401 but got $($r.StatusCode)"
 } catch {
-  $status = $_.Exception.Response.StatusCode.value__
-  Test-Case "Status 401" 401 $status
-  $j = $_.ErrorDetails.Message | ConvertFrom-Json
-  Test-Case "Generic error (no email reveal)" "Invalid email or password." $j.message
+    $status = $_.Exception.Response.StatusCode.value__
+    $body   = $_.ErrorDetails.Message
+    Check "Status 401" "401" $status
+    if ($body) {
+        $j = $body | ConvertFrom-Json
+        Check "Generic error message" "Invalid email or password." $j.message
+    }
 }
 
-# ── T8: GET /me — without session ─────────────────────────────────────────────
-Write-Host "`n[T8] GET /api/auth/me — no session"
+# ------------------------------------------------------------------
+# T7: Login - nonexistent email (must return 401, same generic message)
+# ------------------------------------------------------------------
+Write-Host ""
+Write-Host "[T7] Login -- nonexistent email (expect 401 generic)"
+$ghostBody = '{"email":"ghost@kongu.edu","password":"Test1234"}'
 try {
-  $r = Invoke-WebRequest -Uri "$BASE/api/auth/me" -Method GET -UseBasicParsing
-  Test-Case "Status 401" 401 $r.StatusCode
+    $r = Invoke-WebRequest -Uri "$BASE/api/auth/login" -Method POST `
+         -ContentType "application/json" -Body $ghostBody -UseBasicParsing
+    Fail "T7 should have returned 401 but got $($r.StatusCode)"
 } catch {
-  $status = $_.Exception.Response.StatusCode.value__
-  Test-Case "Status 401" 401 $status
+    $status = $_.Exception.Response.StatusCode.value__
+    $body   = $_.ErrorDetails.Message
+    Check "Status 401" "401" $status
+    if ($body) {
+        $j = $body | ConvertFrom-Json
+        Check "Generic error (no email reveal)" "Invalid email or password." $j.message
+    }
 }
 
-# ── T9: GET /me — with valid session ──────────────────────────────────────────
-Write-Host "`n[T9] GET /api/auth/me — with valid session"
+# ------------------------------------------------------------------
+# T8: GET /me - no session (must return 401)
+# ------------------------------------------------------------------
+Write-Host ""
+Write-Host "[T8] GET /api/auth/me -- no session (expect 401)"
 try {
-  $r = Invoke-WebRequest -Uri "$BASE/api/auth/me" -Method GET `
-       -WebSession $loginSession -UseBasicParsing
-  $j = $r.Content | ConvertFrom-Json
-  Test-Case "Status 200"      200   $r.StatusCode
-  Test-Case "success=true"    $true $j.success
-  Test-Case "Has user.email"  $true ($null -ne $j.user.email)
-  Test-Case "No passwordHash" $true ($null -eq $j.user.passwordHash)
-} catch { Write-Host "  FAIL  Exception: $($_.Exception.Message)" -ForegroundColor Red; $failed++ }
-
-# ── T10: Logout ───────────────────────────────────────────────────────────────
-Write-Host "`n[T10] Logout"
-try {
-  $r = Invoke-WebRequest -Uri "$BASE/api/auth/logout" -Method POST `
-       -WebSession $loginSession -UseBasicParsing
-  $j = $r.Content | ConvertFrom-Json
-  Test-Case "Status 200"   200   $r.StatusCode
-  Test-Case "success=true" $true $j.success
-} catch { Write-Host "  FAIL  Exception: $($_.Exception.Message)" -ForegroundColor Red; $failed++ }
-
-# ── T11: GET /me — after logout (session invalidated) ─────────────────────────
-Write-Host "`n[T11] GET /api/auth/me — after logout (session must be dead)"
-try {
-  $r = Invoke-WebRequest -Uri "$BASE/api/auth/me" -Method GET `
-       -WebSession $loginSession -UseBasicParsing
-  Test-Case "Status 401" 401 $r.StatusCode
+    $r = Invoke-WebRequest -Uri "$BASE/api/auth/me" -Method GET -UseBasicParsing
+    Fail "T8 should have returned 401 but got $($r.StatusCode)"
 } catch {
-  $status = $_.Exception.Response.StatusCode.value__
-  Test-Case "Status 401" 401 $status
+    $status = $_.Exception.Response.StatusCode.value__
+    Check "Status 401" "401" $status
 }
 
-# ── Summary ───────────────────────────────────────────────────────────────────
-Write-Host "`n=== Results ===" -ForegroundColor Cyan
+# ------------------------------------------------------------------
+# T9: GET /me - with valid session (must return 200, no passwordHash)
+# ------------------------------------------------------------------
+Write-Host ""
+Write-Host "[T9] GET /api/auth/me -- with valid session (expect 200)"
+try {
+    $r = Invoke-WebRequest -Uri "$BASE/api/auth/me" -Method GET `
+         -WebSession $loginSession -UseBasicParsing
+    $j = $r.Content | ConvertFrom-Json
+    Check "Status 200"      "200"  $r.StatusCode
+    Check "success=true"    "True" $j.success
+    Check "Has user.email"  "True" ($null -ne $j.user.email)
+    Check "No passwordHash" "True" ($null -eq $j.user.passwordHash)
+    Write-Host "        User: $($j.user.email)" -ForegroundColor DarkGray
+} catch {
+    $status = $_.Exception.Response.StatusCode.value__
+    $body   = $_.ErrorDetails.Message
+    Fail "T9 exception (HTTP $status)" $body
+}
+
+# ------------------------------------------------------------------
+# T10: Logout
+# ------------------------------------------------------------------
+Write-Host ""
+Write-Host "[T10] Logout"
+try {
+    $r = Invoke-WebRequest -Uri "$BASE/api/auth/logout" -Method POST `
+         -WebSession $loginSession -UseBasicParsing
+    $j = $r.Content | ConvertFrom-Json
+    Check "Status 200"   "200"  $r.StatusCode
+    Check "success=true" "True" $j.success
+} catch {
+    $status = $_.Exception.Response.StatusCode.value__
+    $body   = $_.ErrorDetails.Message
+    Fail "T10 exception (HTTP $status)" $body
+}
+
+# ------------------------------------------------------------------
+# T11: GET /me - after logout (session must be invalidated, expect 401)
+# ------------------------------------------------------------------
+Write-Host ""
+Write-Host "[T11] GET /api/auth/me -- after logout (expect 401)"
+try {
+    $r = Invoke-WebRequest -Uri "$BASE/api/auth/me" -Method GET `
+         -WebSession $loginSession -UseBasicParsing
+    Fail "T11 should have returned 401 but got $($r.StatusCode)"
+} catch {
+    $status = $_.Exception.Response.StatusCode.value__
+    Check "Status 401 (session destroyed)" "401" $status
+}
+
+# ------------------------------------------------------------------
+# Summary
+# ------------------------------------------------------------------
+Write-Host ""
+Write-Host "=== Results ===" -ForegroundColor Cyan
 Write-Host "  Passed : $passed" -ForegroundColor Green
-Write-Host "  Failed : $failed" -ForegroundColor $(if ($failed -gt 0) { "Red" } else { "Green" })
+if ($failed -gt 0) {
+    Write-Host "  Failed : $failed" -ForegroundColor Red
+} else {
+    Write-Host "  Failed : $failed" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "  All tests passed!" -ForegroundColor Green
+}
+Write-Host ""

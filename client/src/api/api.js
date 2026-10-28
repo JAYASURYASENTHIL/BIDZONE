@@ -1,55 +1,99 @@
 /**
- * api.js — Central fetch wrapper for all backend calls.
- *
- * - Uses relative URLs (/api/...) so Vite's dev proxy handles routing.
- * - credentials: 'include' ensures the session cookie is sent on every request.
- * - Never touches localStorage for auth state.
+ * Central API client for BIDZONE
+ * Relative URLs (/api) are proxied to localhost:5000 in Vite dev
+ * credentials: 'include' sends session cookies automatically
  */
 
 const BASE = '/api';
 
 async function request(path, options = {}) {
+  const isFormData = options.body instanceof FormData;
+  const headers = { ...options.headers };
+
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
+
   const res = await fetch(`${BASE}${path}`, {
-    credentials: 'include',           // always send session cookie
-    headers: { 'Content-Type': 'application/json', ...options.headers },
+    credentials: 'include',
     ...options,
+    headers,
   });
 
-  const data = await res.json();
+  const data = await res.json().catch(() => ({}));
 
   if (!res.ok) {
-    // Attach the server's message to the thrown error so callers can display it
-    const err = new Error(data.message || 'Something went wrong.');
-    err.status = res.status;
-    err.data = data;
-    throw err;
+    const error = new Error(data.message || 'An error occurred with your request.');
+    error.status = res.status;
+    error.data = data;
+    throw error;
   }
 
   return data;
 }
 
-// ── Auth endpoints (match backend routes exactly) ────────────────────────────
-
 export const authApi = {
-  /** POST /api/auth/signup  — fields: name, email, password */
   signup: (name, email, password) =>
     request('/auth/signup', {
       method: 'POST',
       body: JSON.stringify({ name, email, password }),
     }),
-
-  /** POST /api/auth/login  — fields: email, password */
   login: (email, password) =>
     request('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
+  logout: () => request('/auth/logout', { method: 'POST' }),
+  me: () => request('/auth/me', { method: 'GET' }),
+};
 
-  /** POST /api/auth/logout  — requires active session */
-  logout: () =>
-    request('/auth/logout', { method: 'POST' }),
+export const auctionApi = {
+  list: (params = {}) => {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && v !== '') query.append(k, v);
+    });
+    return request(`/auctions?${query.toString()}`);
+  },
+  getById: (id) => request(`/auctions/${id}`),
+  create: (formData) =>
+    request('/auctions', {
+      method: 'POST',
+      body: formData,
+    }),
+  update: (id, data) =>
+    request(`/auctions/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  cancel: (id) =>
+    request(`/auctions/${id}`, {
+      method: 'DELETE',
+    }),
+  placeBid: (id, amount) =>
+    request(`/auctions/${id}/bids`, {
+      method: 'POST',
+      body: JSON.stringify({ amount }),
+    }),
+  decide: (id, decision) =>
+    request(`/auctions/${id}/decide`, {
+      method: 'POST',
+      body: JSON.stringify({ decision }),
+    }),
+  handover: (id) =>
+    request(`/auctions/${id}/handover`, {
+      method: 'POST',
+      body: JSON.stringify({}),
+    }),
+};
 
-  /** GET /api/auth/me  — returns current user or throws 401 */
-  me: () =>
-    request('/auth/me', { method: 'GET' }),
+export const dashboardApi = {
+  getBuyer: () => request('/dashboard/buyer'),
+  getSeller: () => request('/dashboard/seller'),
+};
+
+export const notificationApi = {
+  getAll: () => request('/notifications'),
+  markAsRead: (id) => request(`/notifications/${id}/read`, { method: 'PATCH' }),
+  markAllAsRead: () => request('/notifications/read-all', { method: 'PATCH' }),
 };
