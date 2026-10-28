@@ -11,6 +11,7 @@ import auctionRoutes from './routes/auctionRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
+import alertRoutes from './routes/alertRoutes.js';
 import errorHandler from './middleware/errorHandler.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -81,6 +82,7 @@ const createApp = () => {
   app.use('/api/dashboard', dashboardRoutes);
   app.use('/api/notifications', notificationRoutes);
   app.use('/api/chat', chatRoutes);
+  app.use('/api/alerts', alertRoutes);
 
   // ── 404 handler ─────────────────────────────────────────────────────────────
   app.use((req, res) => {
