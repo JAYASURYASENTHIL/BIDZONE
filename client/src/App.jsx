@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage.jsx';
 import SignupPage from './pages/SignupPage.jsx';
 import ExplorePage from './pages/ExplorePage.jsx';
 import AuctionDetailPage from './pages/AuctionDetailPage.jsx';
+import AssistantPage from './pages/AssistantPage.jsx';
 import SellPage from './pages/SellPage.jsx';
 import BuyerDashboard from './pages/BuyerDashboard.jsx';
 import SellerDashboard from './pages/SellerDashboard.jsx';
@@ -29,6 +30,14 @@ export default function App() {
             element={
               <AppShell>
                 <ExplorePage />
+              </AppShell>
+            }
+          />
+          <Route
+            path="/assistant"
+            element={
+              <AppShell>
+                <AssistantPage />
               </AppShell>
             }
           />

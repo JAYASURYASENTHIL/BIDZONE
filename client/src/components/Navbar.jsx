@@ -46,6 +46,12 @@ export default function Navbar() {
             Explore
           </NavLink>
           <NavLink
+            to="/assistant"
+            className={({ isActive }) => (isActive ? `${styles.navLink} ${styles.activeLink}` : styles.navLink)}
+          >
+            🤖 AI Assistant
+          </NavLink>
+          <NavLink
             to="/my-bids"
             className={({ isActive }) => (isActive ? `${styles.navLink} ${styles.activeLink}` : styles.navLink)}
           >
@@ -118,6 +124,7 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className={styles.mobileMenu}>
           <Link to="/explore" onClick={() => setMobileMenuOpen(false)}>Explore Auctions</Link>
+          <Link to="/assistant" onClick={() => setMobileMenuOpen(false)}>🤖 AI Assistant</Link>
           <Link to="/my-bids" onClick={() => setMobileMenuOpen(false)}>My Bids</Link>
           <Link to="/seller-dashboard" onClick={() => setMobileMenuOpen(false)}>My Listings</Link>
           <Link to="/purchases" onClick={() => setMobileMenuOpen(false)}>Sales & Handover</Link>

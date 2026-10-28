@@ -1,20 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { chatApi } from '../api/api.js';
+import { Link, useNavigate } from 'react-router-dom';
+import { chatApi, auctionApi } from '../api/api.js';
 import styles from './ChatBot.module.css';
 
 // Simple markdown formatter helper for chat bubbles
 function formatChatMessage(text) {
   if (!text) return '';
-  // Split into paragraphs / lines
   const lines = text.split('\n');
 
   return lines.map((line, idx) => {
-    // Replace **bold** with <strong>
     let parsed = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    // Replace *italic* with <em>
     parsed = parsed.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    // Replace markdown links [label](url) with <a> tags
     parsed = parsed.replace(
       /\[(.*?)\]\((.*?)\)/g,
       '<a href="$2" class="chat-link">$1</a>'
@@ -31,20 +27,23 @@ function formatChatMessage(text) {
 }
 
 export default function ChatBot() {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [actionProcessing, setActionProcessing] = useState(false);
+  const [actionStatuses, setActionStatuses] = useState({});
 
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      text: '👋 Hi! I am **BidBot**, your campus auction assistant!\n\nYou can ask me things like:\n• *"Select me phone within 5k"*\n• *"Who were bidding for my products?"*\n• *"What items am I winning?"*\n• *"How does max price work?"*',
+      text: '👋 Hi! I am **BidBot**, your campus auction assistant!\n\nYou can ask me things like:\n• *"Select me phone within 5k"*\n• *"Find me a cycle under ₹2000 and bid for me"*\n• *"Who were bidding for my products?"*\n• *"How does max price work?"*',
       suggestions: [
+        'Find cycle under ₹2000 and bid for me',
         'Phones under 5k',
-        'Cycles under 3000',
         'Who is bidding on my products?',
         'What am I winning?',
-        'How does max price work?',
+        'How does anti-sniping work?',
       ],
     },
   ]);
@@ -65,7 +64,6 @@ export default function ChatBot() {
     const query = (textToSend || input).trim();
     if (!query || loading) return;
 
-    // Add user message
     const userMsg = { sender: 'user', text: query };
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
@@ -77,6 +75,7 @@ export default function ChatBot() {
         sender: 'bot',
         text: res.reply || 'Here is what I found for you.',
         items: res.items || null,
+        proposedAction: res.proposedAction || null,
         suggestions: res.suggestions || [],
       };
       setMessages((prev) => [...prev, botMsg]);
@@ -91,6 +90,42 @@ export default function ChatBot() {
       ]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleConfirmBid = async (action, index) => {
+    setActionProcessing(true);
+    try {
+      await auctionApi.placeBid(action.auctionId, action.suggestedBid);
+      setActionStatuses((prev) => ({
+        ...prev,
+        [index]: { success: true, text: `🎉 Placed your bid of ₹${action.suggestedBid} on "${action.title}"!` },
+      }));
+    } catch (err) {
+      setActionStatuses((prev) => ({
+        ...prev,
+        [index]: { success: false, text: `⚠️ Bid failed: ${err.message || 'Try again'}` },
+      }));
+    } finally {
+      setActionProcessing(false);
+    }
+  };
+
+  const handleSetAutoBid = async (action, index) => {
+    setActionProcessing(true);
+    try {
+      await auctionApi.setAutoBid(action.auctionId, action.maxBudget);
+      setActionStatuses((prev) => ({
+        ...prev,
+        [index]: { success: true, text: `🤖 Auto-bid ceiling set to ₹${action.maxBudget} on "${action.title}"!` },
+      }));
+    } catch (err) {
+      setActionStatuses((prev) => ({
+        ...prev,
+        [index]: { success: false, text: `⚠️ Auto-bid failed: ${err.message || 'Try again'}` },
+      }));
+    } finally {
+      setActionProcessing(false);
     }
   };
 
@@ -121,14 +156,24 @@ export default function ChatBot() {
                 <p className={styles.botSubtitle}>Ask about deals, bidders, or rules</p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              className={styles.closeBtn}
-              title="Close Chat"
-            >
-              ✕
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Link
+                to="/assistant"
+                onClick={() => setIsOpen(false)}
+                style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: '600', textDecoration: 'none' }}
+                title="Open full page assistant"
+              >
+                Full Tab ↗
+              </Link>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className={styles.closeBtn}
+                title="Close Chat"
+              >
+                ✕
+              </button>
+            </div>
           </div>
 
           {/* Messages List */}
@@ -189,6 +234,47 @@ export default function ChatBot() {
                               <span className={styles.viewAction}>Bid →</span>
                             </Link>
                           ))}
+                        </div>
+                      )}
+
+                      {/* Proposed Action Confirmation Card */}
+                      {msg.proposedAction && msg.proposedAction.type === 'bid_confirmation' && (
+                        <div style={{ marginTop: '10px', padding: '10px', background: '#fff', border: '1px solid #bfdbfe', borderRadius: '8px' }}>
+                          <div style={{ fontSize: '11px', fontWeight: '700', color: '#1d4ed8', marginBottom: '6px' }}>
+                            ⚡ Explicit Authorization Required
+                          </div>
+                          <div style={{ fontSize: '12px', color: 'var(--text-main)', marginBottom: '8px' }}>
+                            Item: <strong>{msg.proposedAction.title}</strong>
+                            <br />
+                            Suggested Bid: <strong>₹{msg.proposedAction.suggestedBid}</strong> | Max Cap: <strong>₹{msg.proposedAction.maxBudget}</strong>
+                          </div>
+
+                          {actionStatuses[index] ? (
+                            <div style={{ fontSize: '11px', fontWeight: '600', color: actionStatuses[index].success ? '#047857' : '#dc2626' }}>
+                              {actionStatuses[index].text}
+                            </div>
+                          ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                              <button
+                                type="button"
+                                onClick={() => handleConfirmBid(msg.proposedAction, index)}
+                                className="btn btn-primary"
+                                style={{ fontSize: '11px', padding: '4px 8px' }}
+                                disabled={actionProcessing}
+                              >
+                                ⚡ Confirm Bid of ₹{msg.proposedAction.suggestedBid}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleSetAutoBid(msg.proposedAction, index)}
+                                className="btn btn-secondary"
+                                style={{ fontSize: '11px', padding: '4px 8px' }}
+                                disabled={actionProcessing}
+                              >
+                                🤖 Set Auto-Bid to ₹{msg.proposedAction.maxBudget}
+                              </button>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
