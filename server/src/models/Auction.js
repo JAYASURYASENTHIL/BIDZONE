@@ -120,6 +120,33 @@ const auctionSchema = new mongoose.Schema(
       type: Number,
       default: null,
     },
+    // Anti-Sniping Last-Minute Extension
+    extendedByAntiSnipe: {
+      type: Boolean,
+      default: false,
+    },
+    extensionCount: {
+      type: Number,
+      default: 0,
+    },
+    // Automatic Proxy Bids
+    proxyBids: [
+      {
+        bidder: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+          required: true,
+        },
+        maxAmount: {
+          type: Number,
+          required: true,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     handover: {
       sellerConfirmed: { type: Boolean, default: false },
       buyerConfirmed: { type: Boolean, default: false },

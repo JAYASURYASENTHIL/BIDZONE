@@ -21,6 +21,12 @@ const notificationSchema = new mongoose.Schema(
         'listing_cancelled',
         'max_price_hit',
         'contact_shared',
+        'alert_match',
+        'question_received',
+        'question_answered',
+        'auto_bid_placed',
+        'auto_bid_outbid',
+        'auction_extended',
       ],
     },
     title: {

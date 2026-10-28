@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 import Auction from '../models/Auction.js';
 import Bid from '../models/Bid.js';
+import User from '../models/User.js';
 import Notification from '../models/Notification.js';
+import { checkAndTriggerAlerts } from './alertController.js';
 
 // ── Helper to check if auction has passed closing time ─────────────────────
 const isAuctionExpired = (auction) => {
@@ -59,6 +61,9 @@ export const createAuction = async (req, res, next) => {
       message: 'Auction listing created successfully.',
       auction,
     });
+
+    // Asynchronously check and trigger matching item alerts for students
+    checkAndTriggerAlerts(auction).catch((err) => console.error('Alert check error:', err));
   } catch (err) {
     next(err);
   }
@@ -210,12 +215,17 @@ export const getAuctionById = async (req, res, next) => {
       delete safeAuction.handover.buyerPhone;
     }
 
+    // Keep proxy limits confidential: only show requester their own limit
+    const myProxy = userId && auction.proxyBids ? auction.proxyBids.find((p) => p.bidder.toString() === userId) : null;
+    delete safeAuction.proxyBids;
+
     res.status(200).json({
       success: true,
       auction: safeAuction,
       bids: safeBids,
       eligibleBidders,
       isLocked: auction.bidCount > 0,
+      myAutoBidMax: myProxy ? myProxy.maxAmount : null,
     });
   } catch (err) {
     next(err);
@@ -290,6 +300,19 @@ export const placeBid = async (req, res, next) => {
 
     auction.currentBid = finalBidAmount;
     auction.bidCount += 1;
+
+    // ── Last-minute anti-sniping extension ──────────────────────────────────
+    // If a valid bid arrives in the last 30 seconds, closing time moves to 60 seconds after that bid
+    const nowTime = new Date();
+    const timeRemainingMs = new Date(auction.closingAt).getTime() - nowTime.getTime();
+    let wasExtended = false;
+
+    if (!hitsMaxPrice && timeRemainingMs <= 30000 && timeRemainingMs > 0) {
+      auction.closingAt = new Date(nowTime.getTime() + 60000);
+      auction.extendedByAntiSnipe = true;
+      auction.extensionCount = (auction.extensionCount || 0) + 1;
+      wasExtended = true;
+    }
 
     // When max price is hit, the bid completes immediately and matches buyer and seller
     if (hitsMaxPrice) {
@@ -367,17 +390,212 @@ export const placeBid = async (req, res, next) => {
           closedEarly: true,
         });
       }
+      if (wasExtended) {
+        io.to(`auction:${id}`).emit('auction:extended', {
+          auctionId: id,
+          newClosingAt: auction.closingAt,
+          extensionCount: auction.extensionCount,
+          message: '⏱️ Auction extended by 60 seconds due to a bid in the final 30 seconds!',
+        });
+      }
     }
 
     res.status(201).json({
       success: true,
       message: hitsMaxPrice
         ? `🎉 Maximum price of ₹${auction.maxPrice} hit! The auction is completed and you are matched with the seller!`
+        : wasExtended
+        ? 'Bid placed! Closing time extended by 60s (Anti-Sniping protection).'
         : 'Bid placed successfully!',
       currentBid: finalBidAmount,
       bidCount: auction.bidCount,
       hitMaxPrice: hitsMaxPrice,
       status: auction.status,
+      closingAt: auction.closingAt,
+      wasExtended,
+    });
+
+    // Check and trigger any registered automatic proxy bids
+    if (!hitsMaxPrice && auction.status === 'active') {
+      processAutoBids(auction, bidderId, io).catch((err) => console.error('Auto-bid error:', err));
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ── Helper: Process Automatic Proxy Bids ─────────────────────────────────────
+export const processAutoBids = async (auction, currentLeadingBidderId, io) => {
+  try {
+    if (auction.status !== 'active' || auction.closedEarly) return;
+    if (!auction.proxyBids || auction.proxyBids.length === 0) return;
+
+    // Filter proxies from other users
+    const otherProxies = auction.proxyBids
+      .filter((p) => p.bidder.toString() !== currentLeadingBidderId.toString())
+      .sort((a, b) => b.maxAmount - a.maxAmount);
+
+    if (otherProxies.length === 0) return;
+
+    const topProxy = otherProxies[0];
+    const nextRequired = (auction.currentBid || auction.startingPrice) + auction.minIncrement;
+
+    if (topProxy.maxAmount >= nextRequired) {
+      // Determine auto-bid amount: only as much as needed to lead
+      let autoBidAmount = nextRequired;
+      if (auction.maxPrice && autoBidAmount > auction.maxPrice) {
+        autoBidAmount = auction.maxPrice;
+      }
+
+      const hitsMax = Boolean(auction.maxPrice && autoBidAmount === auction.maxPrice);
+
+      // Unset previous leading bid
+      await Bid.updateMany({ auction: auction._id, isLeading: true }, { isLeading: false });
+
+      const autoBid = await Bid.create({
+        auction: auction._id,
+        bidder: topProxy.bidder,
+        amount: autoBidAmount,
+        isLeading: true,
+        placedAt: new Date(),
+      });
+
+      auction.currentBid = autoBidAmount;
+      auction.bidCount += 1;
+
+      if (hitsMax) {
+        const now = new Date();
+        auction.winner = topProxy.bidder;
+        auction.hitMaxPrice = true;
+        auction.status = 'handover_pending';
+        auction.closedEarly = true;
+        auction.closedEarlyAt = now;
+        auction.winnerSelectionMethod = 'automatic_highest';
+        auction.selectedWinningBid = autoBid._id;
+        auction.selectedWinningAmount = autoBidAmount;
+      }
+
+      await auction.save();
+
+      const bidderDoc = await User.findById(topProxy.bidder).select('name');
+
+      // Notify outbid user
+      await Notification.create({
+        recipient: currentLeadingBidderId,
+        type: 'outbid',
+        title: 'You have been outbid by an automatic proxy bid!',
+        message: `An automatic proxy bid of ₹${autoBidAmount} was placed on "${auction.title}". Place a new bid to regain the lead!`,
+        data: { auctionId: auction._id, amount: autoBidAmount },
+      });
+
+      // Notify proxy bidder
+      await Notification.create({
+        recipient: topProxy.bidder,
+        type: 'auto_bid_placed',
+        title: '🤖 Automatic Proxy Bid Placed For You!',
+        message: `We automatically placed a bid of ₹${autoBidAmount} on "${auction.title}" to keep you leading (within your ₹${topProxy.maxAmount} maximum limit).`,
+        data: { auctionId: auction._id, amount: autoBidAmount, maxLimit: topProxy.maxAmount },
+      });
+
+      if (io) {
+        io.to(`auction:${auction._id}`).emit('bid:update', {
+          auctionId: auction._id,
+          currentBid: autoBidAmount,
+          bidCount: auction.bidCount,
+          latestBid: {
+            _id: autoBid._id,
+            amount: autoBidAmount,
+            placedAt: autoBid.placedAt,
+            bidderName: bidderDoc?.name || 'A Student',
+            isAutoBid: true,
+          },
+        });
+
+        if (hitsMax) {
+          io.to(`auction:${auction._id}`).emit('auction:max_price_hit', {
+            auctionId: auction._id,
+            currentBid: autoBidAmount,
+            winner: topProxy.bidder,
+            status: 'handover_pending',
+            hitMaxPrice: true,
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Error in processAutoBids:', err);
+  }
+};
+
+// ── POST /api/auctions/:id/auto-bid (Set maximum proxy auto-bid limit) ──────
+export const setAutoBid = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { maxAmount } = req.body;
+    const userId = req.session.userId;
+
+    const maxLimit = Number(maxAmount);
+    if (!maxLimit || maxLimit <= 0) {
+      return res.status(400).json({ success: false, message: 'Please specify a valid maximum budget limit for automatic bidding.' });
+    }
+
+    const auction = await Auction.findById(id);
+    if (!auction) {
+      return res.status(404).json({ success: false, message: 'Auction not found.' });
+    }
+
+    if (auction.seller.toString() === userId) {
+      return res.status(403).json({ success: false, message: 'Sellers cannot bid on their own auctions.' });
+    }
+
+    if (auction.closedEarly || auction.status !== 'active' || isAuctionExpired(auction)) {
+      return res.status(400).json({ success: false, message: 'This auction has ended or is not active.' });
+    }
+
+    const calculatedMin =
+      auction.bidCount === 0 ? auction.startingPrice : (auction.currentBid || auction.startingPrice) + auction.minIncrement;
+    const minRequired = auction.maxPrice ? Math.min(calculatedMin, auction.maxPrice) : calculatedMin;
+
+    if (maxLimit < minRequired) {
+      return res.status(400).json({
+        success: false,
+        message: `Your auto-bid limit must be at least ₹${minRequired}.`,
+      });
+    }
+
+    if (auction.maxPrice && maxLimit > auction.maxPrice) {
+      return res.status(400).json({
+        success: false,
+        message: `Auto-bid limit cannot exceed the seller's maximum price ceiling of ₹${auction.maxPrice}.`,
+      });
+    }
+
+    if (!auction.proxyBids) auction.proxyBids = [];
+
+    const existingIdx = auction.proxyBids.findIndex((p) => p.bidder.toString() === userId);
+    if (existingIdx >= 0) {
+      auction.proxyBids[existingIdx].maxAmount = maxLimit;
+      auction.proxyBids[existingIdx].createdAt = new Date();
+    } else {
+      auction.proxyBids.push({ bidder: userId, maxAmount: maxLimit });
+    }
+
+    await auction.save();
+
+    const io = req.app.get('io');
+    const leadingBid = await Bid.findOne({ auction: id, isLeading: true });
+    const currentLeaderId = leadingBid ? leadingBid.bidder.toString() : null;
+
+    // If user is not currently leading, trigger auto-bid immediately to take the lead
+    if (currentLeaderId !== userId) {
+      await processAutoBids(auction, currentLeaderId || 'none', io);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Automatic bidding activated up to ₹${maxLimit}! BIDZONE will automatically place the minimum needed to keep you in the lead.`,
+      maxLimit,
+      currentBid: auction.currentBid,
     });
   } catch (err) {
     next(err);
