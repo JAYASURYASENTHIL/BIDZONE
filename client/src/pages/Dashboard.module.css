@@ -1,99 +1,136 @@
 .page {
-  padding-top: 32px;
-  padding-bottom: 60px;
+  padding-top: 36px;
+  padding-bottom: 72px;
 }
 
 .header {
-  margin-bottom: 28px;
+  margin-bottom: 32px;
 }
 
 .title {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 800;
   color: var(--text-main);
-  letter-spacing: -0.5px;
+  letter-spacing: -0.6px;
 }
 
 .subtitle {
   font-size: 14px;
   color: var(--text-muted);
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
+/* Stats Row */
 .statsRow {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+  margin-bottom: 40px;
 }
 
 .statCard {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 18px 20px;
+  border-radius: var(--radius-xl);
+  padding: 22px 24px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.statCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), #818cf8);
+  opacity: 0.8;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
 }
 
 .statLabel {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
 
 .statValue {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
 }
 
+/* Section */
 .section {
-  margin-bottom: 36px;
+  margin-bottom: 44px;
 }
 
 .sectionHeading {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 18px;
-  font-weight: 700;
+  gap: 10px;
+  font-size: 19px;
+  font-weight: 800;
   color: var(--text-main);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  letter-spacing: -0.3px;
 }
 
 .countPill {
   font-size: 12px;
   background: var(--bg-subtle);
+  border: 1px solid var(--border);
   color: var(--text-muted);
-  padding: 2px 8px;
+  font-weight: 700;
+  padding: 2px 10px;
   border-radius: var(--radius-full);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
 }
 
 .emptyBox {
   background: var(--bg-card);
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-lg);
-  padding: 32px 20px;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-xl);
+  padding: 48px 24px;
   text-align: center;
   color: var(--text-muted);
   font-size: 14px;
+  line-height: 1.5;
 }
 
+/* Table Card */
 .tableCard {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -105,23 +142,27 @@
 
 .table th {
   background: var(--bg-subtle);
-  padding: 12px 16px;
-  font-size: 12px;
+  padding: 14px 20px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.7px;
   border-bottom: 1px solid var(--border);
 }
 
 .table td {
-  padding: 14px 16px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
 }
 
 .table tr:last-child td {
   border-bottom: none;
+}
+
+.table tr:hover td {
+  background-color: rgba(248, 250, 252, 0.6);
 }
 
 .itemTitleCell {
@@ -131,30 +172,33 @@
 
 .actionCell {
   display: flex;
+  align-items: center;
   gap: 8px;
 }
 
-/* Item Alerts Section (Never Miss What You Need) */
+/* Item Alerts Section */
 .alertCard {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  margin-bottom: 36px;
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  margin-bottom: 40px;
+  box-shadow: var(--shadow-sm);
 }
 
 .alertHeader {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .alertTitle {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 19px;
+  font-weight: 800;
   color: var(--text-main);
   display: flex;
   align-items: center;
   gap: 8px;
   margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
 }
 
 .alertSubtitle {
@@ -167,26 +211,34 @@
 .alertForm {
   display: grid;
   grid-template-columns: 2fr 1.2fr 1fr auto;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 24px;
   background: var(--bg-subtle);
-  padding: 14px;
-  border-radius: var(--radius-md);
+  padding: 18px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 840px) {
   .alertForm {
     grid-template-columns: 1fr;
   }
 }
 
 .alertInput {
-  padding: 8px 12px;
+  padding: 10px 14px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   font-size: 13px;
-  background: #fff;
+  background: #ffffff;
+  color: var(--text-main);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.alertInput:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
 }
 
 .alertList {
@@ -199,16 +251,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 14px;
+  padding: 14px 18px;
   background: var(--bg-subtle);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.15s ease;
+}
+
+.alertItem:hover {
+  border-color: var(--border-hover);
 }
 
 .alertTags {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -221,23 +278,25 @@
 .alertBudgetPill {
   background: #ecfdf5;
   color: #047857;
+  border: 1px solid #a7f3d0;
   font-size: 12px;
   font-weight: 700;
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: var(--radius-full);
 }
 
 .alertCategoryPill {
   background: #eff6ff;
   color: #1d4ed8;
+  border: 1px solid #bfdbfe;
   font-size: 12px;
   font-weight: 600;
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: var(--radius-full);
 }
 
 .alertMatchCount {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-muted);
 }
 
@@ -245,14 +304,26 @@
   background: transparent;
   color: #dc2626;
   border: 1px solid #fecaca;
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .deleteAlertBtn:hover {
   background: #fef2f2;
+  border-color: #f87171;
+}
+
+@media (max-width: 640px) {
+  .statsRow {
+    grid-template-columns: 1fr;
+  }
+  .alertItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 }

@@ -1,52 +1,67 @@
+/* ==========================================================================
+   Global Navigation Header Styles
+   ========================================================================== */
+
 .header {
   position: sticky;
   top: 0;
-  z-index: 100;
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
+  transition: all var(--transition-fast);
 }
 
 .navContainer {
-  height: 68px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
 
+/* Brand Section */
 .brand {
   display: flex;
   align-items: center;
   gap: 10px;
   text-decoration: none;
+  user-select: none;
 }
 
 .logoBadge {
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, var(--primary), #818cf8);
-  color: #fff;
+  background: var(--primary-gradient);
+  color: #ffffff;
   font-weight: 800;
   font-size: 15px;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 4px 10px rgba(67, 56, 202, 0.28);
+  letter-spacing: -0.04em;
+  transition: transform var(--transition-normal);
+}
+
+.brand:hover .logoBadge {
+  transform: scale(1.05);
 }
 
 .brandName {
   font-size: 20px;
   font-weight: 800;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.04em;
   color: var(--text-main);
 }
 
+/* Desktop Navigation Links */
 .desktopNav {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .navLink {
@@ -55,19 +70,27 @@
   font-weight: 600;
   color: var(--text-muted);
   border-radius: var(--radius-md);
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
+  position: relative;
 }
 
 .navLink:hover {
-  color: var(--primary);
+  color: var(--text-main);
   background-color: var(--bg-subtle);
 }
 
 .activeLink {
   color: var(--primary);
   background-color: var(--primary-light);
+  font-weight: 700;
 }
 
+.activeLink:hover {
+  color: var(--primary-hover);
+  background-color: var(--primary-light-hover);
+}
+
+/* Right Header Actions */
 .actions {
   display: flex;
   align-items: center;
@@ -76,7 +99,9 @@
 
 .sellBtn {
   font-size: 13px;
+  font-weight: 700;
   padding: 8px 16px;
+  border-radius: var(--radius-md);
 }
 
 .notifBtn {
@@ -90,13 +115,14 @@
   color: var(--text-muted);
   border: 1px solid var(--border);
   background: var(--bg-card);
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 }
 
 .notifBtn:hover {
   color: var(--text-main);
   background: var(--bg-subtle);
-  border-color: var(--text-subtle);
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
 }
 
 .notifBadge {
@@ -104,7 +130,7 @@
   top: -4px;
   right: -4px;
   background-color: var(--danger);
-  color: #fff;
+  color: #ffffff;
   font-size: 11px;
   font-weight: 700;
   min-width: 18px;
@@ -114,17 +140,24 @@
   align-items: center;
   justify-content: center;
   padding: 0 4px;
-  border: 2px solid #fff;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(220, 38, 38, 0.4);
 }
 
+/* User Account Menu */
 .userMenu {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: var(--bg-subtle);
   padding: 4px 10px 4px 6px;
   border-radius: var(--radius-full);
   border: 1px solid var(--border);
+  transition: border-color var(--transition-fast);
+}
+
+.userMenu:hover {
+  border-color: var(--border-hover);
 }
 
 .userProfileBtn {
@@ -138,13 +171,14 @@
   width: 28px;
   height: 28px;
   border-radius: var(--radius-full);
-  background: var(--primary);
-  color: #fff;
-  font-size: 13px;
+  background: var(--primary-gradient);
+  color: #ffffff;
+  font-size: 12px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 1px 3px rgba(67, 56, 202, 0.25);
 }
 
 .userName {
@@ -163,21 +197,32 @@
   font-size: 12px;
   font-weight: 600;
   color: var(--text-muted);
-  padding: 2px 6px;
+  padding: 3px 7px;
   border-radius: var(--radius-sm);
-  transition: color 0.2s;
+  transition: all var(--transition-fast);
 }
 
 .logoutBtn:hover {
   color: var(--danger);
+  background-color: var(--danger-light);
 }
 
+/* Mobile Toggle & Menu Drawer */
 .mobileToggle {
   display: none;
   background: none;
-  border: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   color: var(--text-main);
-  padding: 6px;
+  padding: 7px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.mobileToggle:hover {
+  background-color: var(--bg-subtle);
 }
 
 .mobileMenu {
@@ -185,28 +230,52 @@
   flex-direction: column;
   background: var(--bg-card);
   border-bottom: 1px solid var(--border);
-  padding: 16px 20px;
-  gap: 12px;
+  padding: 16px 20px 24px;
+  gap: 8px;
+  box-shadow: var(--shadow-lg);
+  animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .mobileMenu a {
   font-size: 15px;
   font-weight: 600;
   color: var(--text-main);
-  padding: 6px 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.mobileMenu a:hover {
+  background-color: var(--bg-subtle);
+  color: var(--primary);
 }
 
 .mobileLogout {
   background: none;
-  border: none;
-  text-align: left;
-  font-size: 15px;
-  font-weight: 600;
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
   color: var(--danger);
-  padding: 6px 0;
+  background-color: var(--danger-light);
+  padding: 10px;
+  margin-top: 8px;
+  cursor: pointer;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 960px) {
   .desktopNav {
     display: none;
   }

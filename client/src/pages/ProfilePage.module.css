@@ -1,14 +1,15 @@
 .page {
-  padding-top: 36px;
-  padding-bottom: 60px;
-  max-width: 720px;
+  padding-top: 40px;
+  padding-bottom: 72px;
+  max-width: 740px;
+  margin: 0 auto;
 }
 
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 36px;
+  border-radius: var(--radius-xl);
+  padding: 40px;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
@@ -18,36 +19,38 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding-bottom: 24px;
+  gap: 24px;
+  padding-bottom: 28px;
   border-bottom: 1px solid var(--border);
 }
 
 .avatar {
-  width: 72px;
-  height: 72px;
+  width: 80px;
+  height: 80px;
   border-radius: var(--radius-full);
   background: linear-gradient(135deg, var(--primary), #818cf8);
-  color: #fff;
-  font-size: 28px;
+  color: #ffffff;
+  font-size: 32px;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+  flex-shrink: 0;
 }
 
 .name {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 800;
   color: var(--text-main);
   line-height: 1.2;
+  letter-spacing: -0.5px;
 }
 
 .email {
   font-size: 14px;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 .roleTag {
@@ -56,17 +59,20 @@
   background: var(--success-light);
   color: var(--success);
   border: 1px solid #a7f3d0;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 2px 10px;
+  padding: 3px 10px;
   border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
 }
 
 .sectionTitle {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 800;
   color: var(--text-main);
   margin-bottom: 14px;
+  letter-spacing: -0.3px;
 }
 
 .infoGrid {
@@ -74,8 +80,9 @@
   flex-direction: column;
   gap: 12px;
   background: var(--bg-subtle);
-  padding: 18px 20px;
-  border-radius: var(--radius-md);
+  padding: 20px 22px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
 }
 
 .infoRow {
@@ -98,50 +105,64 @@
 .linksGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 14px;
 }
 
 @media (max-width: 600px) {
   .linksGrid {
     grid-template-columns: 1fr;
   }
+  .card {
+    padding: 28px 20px;
+  }
+  .header {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
 }
 
 .linkCard {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   background: var(--bg-card);
   text-decoration: none;
   color: inherit;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
 }
 
 .linkCard:hover {
   border-color: var(--primary);
   background: var(--primary-light);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .linkIcon {
-  font-size: 24px;
+  font-size: 26px;
 }
 
 .linkCard strong {
+  display: block;
   font-size: 14px;
+  font-weight: 700;
   color: var(--text-main);
+  margin-bottom: 2px;
 }
 
 .linkCard p {
   font-size: 12px;
   color: var(--text-muted);
+  margin: 0;
 }
 
 .footer {
-  padding-top: 16px;
+  padding-top: 20px;
   border-top: 1px solid var(--border);
   display: flex;
   justify-content: flex-end;
