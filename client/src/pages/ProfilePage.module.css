@@ -1,87 +1,79 @@
+/* Profile — clear identity card, no decoration */
+
 .page {
-  padding-top: 40px;
-  padding-bottom: 72px;
-  max-width: 740px;
+  padding-top: 28px;
+  padding-bottom: 60px;
+  max-width: 680px;
   margin: 0 auto;
 }
 
 .card {
-  background: var(--bg-card);
+  background: #ffffff;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 40px;
-  box-shadow: var(--shadow-sm);
+  padding: 28px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
 }
 
 .header {
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding-bottom: 28px;
+  gap: 16px;
+  padding-bottom: 20px;
   border-bottom: 1px solid var(--border);
 }
 
 .avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--primary), #818cf8);
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-md);
+  background: var(--primary);
   color: #ffffff;
-  font-size: 32px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
   flex-shrink: 0;
 }
 
 .name {
-  font-size: 26px;
-  font-weight: 800;
+  font-size: 20px;
+  font-weight: 600;
   color: var(--text-main);
-  line-height: 1.2;
-  letter-spacing: -0.5px;
+  line-height: 1.25;
 }
 
 .email {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-muted);
-  margin-top: 3px;
+  margin-top: 2px;
 }
 
 .roleTag {
   display: inline-block;
-  margin-top: 8px;
+  margin-top: 6px;
   background: var(--success-light);
   color: var(--success);
-  border: 1px solid #a7f3d0;
+  border: 1px solid var(--success-border);
   font-size: 11px;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
 }
 
 .sectionTitle {
-  font-size: 17px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--text-main);
-  margin-bottom: 14px;
-  letter-spacing: -0.3px;
+  margin-bottom: 10px;
 }
 
+/* Info rows */
 .infoGrid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  background: var(--bg-subtle);
-  padding: 20px 22px;
-  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
 }
 
@@ -89,8 +81,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 14px;
+  font-size: 13px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
 }
+
+.infoRow:last-child { border-bottom: none; }
 
 .infoLabel {
   color: var(--text-muted);
@@ -99,60 +95,47 @@
 
 .infoValue {
   color: var(--text-main);
-  font-weight: 700;
+  font-weight: 600;
 }
 
+/* Navigation links grid */
 .linksGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: 8px;
 }
 
-@media (max-width: 600px) {
-  .linksGrid {
-    grid-template-columns: 1fr;
-  }
-  .card {
-    padding: 28px 20px;
-  }
-  .header {
-    flex-direction: column;
-    text-align: center;
-    gap: 16px;
-  }
+@media (max-width: 520px) {
+  .linksGrid { grid-template-columns: 1fr; }
+  .header { flex-direction: column; align-items: flex-start; }
 }
 
 .linkCard {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 16px 18px;
-  border-radius: var(--radius-lg);
+  gap: 10px;
+  padding: 12px 14px;
   border: 1px solid var(--border);
-  background: var(--bg-card);
+  background: #ffffff;
   text-decoration: none;
   color: inherit;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--shadow-sm);
+  transition: all var(--transition);
 }
 
 .linkCard:hover {
   border-color: var(--primary);
   background: var(--primary-light);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
 }
 
 .linkIcon {
-  font-size: 26px;
+  font-size: 20px;
 }
 
 .linkCard strong {
   display: block;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--text-main);
-  margin-bottom: 2px;
 }
 
 .linkCard p {
@@ -162,7 +145,7 @@
 }
 
 .footer {
-  padding-top: 20px;
+  padding-top: 16px;
   border-top: 1px solid var(--border);
   display: flex;
   justify-content: flex-end;

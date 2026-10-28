@@ -1,51 +1,38 @@
+/* Auction Detail — transaction-focused, image-led */
+
 .page {
-  padding-top: 28px;
-  padding-bottom: 64px;
+  padding-top: 20px;
+  padding-bottom: 60px;
 }
 
 .breadcrumbs {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-size: 13px;
   color: var(--text-muted);
-  margin-bottom: 24px;
-  flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
-.breadcrumbs a {
-  color: var(--text-muted);
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
+.breadcrumbs a { color: var(--text-muted); }
+.breadcrumbs a:hover { color: var(--primary); }
 
-.breadcrumbs a:hover {
-  color: var(--primary);
-}
-
-.crumbSep {
-  color: var(--text-subtle);
-  font-size: 11px;
-}
-
-.crumbCategory {
-  text-transform: capitalize;
-  font-weight: 500;
-}
-
+.crumbSep { color: var(--text-subtle); }
+.crumbCategory { text-transform: capitalize; }
 .crumbCurrent {
-  color: var(--text-main);
-  font-weight: 600;
-  max-width: 320px;
+  color: var(--text-body);
+  font-weight: 500;
+  max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+/* Two-column layout */
 .layout {
   display: grid;
-  grid-template-columns: 1.25fr 1fr;
-  gap: 36px;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 32px;
   align-items: start;
 }
 
@@ -53,485 +40,422 @@
 .rightCol {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 /* Gallery */
 .gallery {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .mainImageWrapper {
   position: relative;
   width: 100%;
   aspect-ratio: 4 / 3;
-  background-color: #ffffff;
-  border-radius: var(--radius-xl);
+  background: #f9f9f8;
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: box-shadow 0.2s ease;
-}
-
-.mainImageWrapper:hover {
-  box-shadow: var(--shadow-md);
 }
 
 .mainImage {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background-color: #ffffff;
-  transition: transform 0.3s ease;
+  background: #ffffff;
 }
 
 .statusFloat {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 12px;
+  right: 12px;
   z-index: 2;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.08));
 }
 
 .thumbnails {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   overflow-x: auto;
-  padding: 2px 2px 8px;
   scrollbar-width: thin;
 }
 
 .thumbBtn {
-  width: 76px;
-  height: 76px;
-  border-radius: var(--radius-md);
-  border: 2px solid var(--border);
-  padding: 2px;
-  background: #ffffff;
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--border);
+  padding: 0;
+  background: none;
   overflow: hidden;
   cursor: pointer;
   flex-shrink: 0;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color var(--transition);
 }
 
-.thumbBtn:hover {
-  border-color: var(--primary);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
-}
-
-.activeThumb {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-border);
-}
+.thumbBtn:hover { border-color: var(--border-hover); }
+.activeThumb { border-color: var(--primary); border-width: 2px; }
 
 .thumbImg {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: calc(var(--radius-md) - 3px);
 }
 
 /* Details Card */
 .detailsCard {
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
+  background: #ffffff;
   border: 1px solid var(--border);
-  padding: 28px;
-  box-shadow: var(--shadow-sm);
+  padding: 20px;
 }
 
 .detailsHeader {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-
-.sectionTitle {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--text-main);
-  letter-spacing: -0.3px;
   margin-bottom: 12px;
 }
 
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 10px;
+}
+
 .descriptionText {
-  color: var(--text-muted);
-  font-size: 15px;
+  color: var(--text-body);
+  font-size: 14px;
   line-height: 1.65;
   white-space: pre-wrap;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .specGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 14px;
-  background: var(--bg-subtle);
-  padding: 18px;
-  border-radius: var(--radius-lg);
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0;
   border: 1px solid var(--border);
 }
 
 .specItem {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
+  padding: 12px 14px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .specLabel {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.04em;
 }
 
 .specValue {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--text-main);
   text-transform: capitalize;
 }
 
-/* Bid Action Card */
+/* Bid Card — right column, sticky */
 .bidCard {
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
+  background: #ffffff;
   border: 1px solid var(--border);
-  padding: 28px;
-  box-shadow: var(--shadow-sm);
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   position: sticky;
-  top: 90px;
+  top: 76px;
 }
 
 .timerRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: 14px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
 }
 
 .timeLabel {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .itemTitle {
-  font-size: 24px;
-  font-weight: 800;
+  font-size: 20px;
+  font-weight: 600;
   line-height: 1.3;
   color: var(--text-main);
-  letter-spacing: -0.4px;
 }
 
+/* Price section */
 .priceContainer {
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(99, 102, 241, 0.08) 100%);
-  border: 1px solid var(--primary-border);
-  border-radius: var(--radius-lg);
-  padding: 18px 20px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .priceLabel {
   font-size: 11px;
-  font-weight: 700;
-  color: var(--primary);
+  font-weight: 500;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.04em;
 }
 
 .currentPrice {
-  font-size: 34px;
-  font-weight: 800;
+  font-size: 28px;
+  font-weight: 700;
   color: var(--text-main);
-  letter-spacing: -0.8px;
   font-variant-numeric: tabular-nums;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .bidCountBadge {
   font-size: 12px;
   color: var(--text-muted);
-  font-weight: 600;
 }
 
+/* Bid form */
 .bidForm {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .bidInputGroup {
   display: flex;
   align-items: center;
   position: relative;
-  gap: 10px;
 }
 
 .currencyPrefix {
   position: absolute;
-  left: 14px;
-  font-size: 18px;
-  font-weight: 700;
+  left: 12px;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--text-muted);
   pointer-events: none;
 }
 
 .bidField {
-  flex: 1;
-  padding: 13px 14px 13px 34px;
-  border-radius: var(--radius-md);
-  border: 1.5px solid var(--border);
-  font-size: 18px;
-  font-weight: 700;
+  width: 100%;
+  padding: 11px 12px 11px 28px;
+  border: 1px solid var(--border);
+  font-size: 17px;
+  font-weight: 600;
   color: var(--text-main);
-  background: var(--bg-subtle);
+  background: #ffffff;
   outline: none;
   font-variant-numeric: tabular-nums;
-  transition: all 0.2s ease;
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 
 .bidField:focus {
   border-color: var(--primary);
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .bidHint {
   font-size: 12px;
   color: var(--text-muted);
-  line-height: 1.4;
 }
 
 .bidAlertError {
   background: var(--danger-light);
   color: var(--danger);
-  border: 1px solid #fecaca;
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
+  border: 1px solid var(--danger-border);
+  padding: 8px 12px;
   font-size: 13px;
-  font-weight: 600;
-  line-height: 1.45;
+  font-weight: 500;
 }
 
 .bidAlertSuccess {
   background: var(--success-light);
   color: var(--success);
-  border: 1px solid #a7f3d0;
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
+  border: 1px solid var(--success-border);
+  padding: 8px 12px;
   font-size: 13px;
-  font-weight: 600;
-  line-height: 1.45;
+  font-weight: 500;
 }
 
 .sellerNotice,
 .closedNotice {
   background: var(--bg-subtle);
   border: 1px solid var(--border);
-  padding: 16px;
-  border-radius: var(--radius-md);
+  padding: 12px 14px;
   text-align: center;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--text-muted);
 }
 
 .decisionBox {
   background: #fffbeb;
-  border: 1px solid #fde68a;
-  padding: 18px;
-  border-radius: var(--radius-lg);
+  border: 1px solid var(--warning-border);
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .decisionActions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .handoverBox {
-  background: #f5f3ff;
-  border: 1px solid #ddd6fe;
-  padding: 18px;
-  border-radius: var(--radius-lg);
+  background: #faf5ff;
+  border: 1px solid #e9d5ff;
+  padding: 14px;
 }
 
 .handoverStatusRow {
   display: flex;
   justify-content: space-between;
   font-size: 13px;
-  margin-top: 10px;
-  color: #5b21b6;
-  font-weight: 600;
+  margin-top: 8px;
+  color: var(--text-muted);
 }
 
-/* Bid History */
+/* Bid history */
 .historyCard {
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
+  background: #ffffff;
   border: 1px solid var(--border);
-  padding: 24px;
-  box-shadow: var(--shadow-sm);
+  padding: 16px 20px;
 }
 
 .historyTitle {
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--text-main);
-  margin-bottom: 14px;
-  letter-spacing: -0.3px;
+  margin-bottom: 12px;
 }
 
 .noBidsText {
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: 13px;
   text-align: center;
-  padding: 24px 0;
+  padding: 16px 0;
 }
 
 .bidList {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .bidItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
-  border-radius: var(--radius-md);
-  background: var(--bg-subtle);
-  border: 1px solid var(--border);
-  transition: all 0.15s ease;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
 }
+
+.bidItem:last-child { border-bottom: none; }
 
 .leadingItem {
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.06), rgba(99, 102, 241, 0.1));
-  border-color: var(--primary-border);
+  background: var(--primary-light);
+  margin: 0 -8px;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--primary-border);
 }
 
-.bidderInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.bidderName {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
-.bidTime {
-  font-size: 11px;
-  color: var(--text-muted);
-}
+.bidderInfo { display: flex; flex-direction: column; gap: 1px; }
+.bidderName { font-size: 13px; font-weight: 600; color: var(--text-main); }
+.bidTime { font-size: 11px; color: var(--text-muted); }
 
 .bidAmountCol {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .bidAmount {
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 700;
   color: var(--text-main);
   font-variant-numeric: tabular-nums;
 }
 
 .leadingPill {
   background: var(--primary);
-  color: #fff;
+  color: #ffffff;
   font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
 }
 
-/* Lock Badge & Notice */
+/* Lock & Notices */
 .lockBadge {
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
+  background: var(--danger-light);
+  color: var(--danger);
+  border: 1px solid var(--danger-border);
   font-size: 11px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
 }
 
 .earlyCloseBanner {
   background: #fffbeb;
-  border: 1px solid #fde68a;
-  border-radius: var(--radius-lg);
-  padding: 16px;
+  border: 1px solid var(--warning-border);
+  padding: 12px 14px;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
   font-size: 13px;
   color: #92400e;
 }
 
 .earlyCloseBanner strong {
   display: block;
-  font-size: 14px;
+  font-size: 13px;
   color: #78350f;
   margin-bottom: 2px;
+  font-weight: 600;
 }
 
 .overrideNotice {
   display: inline-block;
-  margin-top: 6px;
-  background: #fee2e2;
-  color: #991b1b;
+  margin-top: 4px;
+  background: var(--danger-light);
+  color: var(--danger);
   font-size: 11px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
 }
 
 .highestNotice {
   display: inline-block;
-  margin-top: 6px;
-  background: #dcfce7;
-  color: #166534;
+  margin-top: 4px;
+  background: var(--success-light);
+  color: var(--success);
   font-size: 11px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: var(--radius-full);
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
 }
 
-/* Early Close Modal */
+/* Modal */
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -540,15 +464,14 @@
 }
 
 .modalContent {
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
+  background: #ffffff;
   border: 1px solid var(--border);
-  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-dropdown);
   width: 100%;
-  max-width: 540px;
+  max-width: 520px;
   max-height: 90vh;
   overflow-y: auto;
-  padding: 28px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
 }
@@ -557,189 +480,146 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
 }
 
 .modalHeader h3 {
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 17px;
+  font-weight: 600;
   color: var(--text-main);
-  letter-spacing: -0.4px;
 }
 
 .modalCloseBtn {
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 18px;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 4px;
-  border-radius: var(--radius-sm);
-  transition: color 0.15s ease;
+  padding: 2px;
+  transition: color var(--transition);
 }
 
-.modalCloseBtn:hover {
-  color: var(--text-main);
-}
+.modalCloseBtn:hover { color: var(--text-main); }
 
 .modalWarning {
-  background: #fff1f2;
-  border: 1px solid #fecdd3;
-  color: #9f1239;
-  padding: 12px 16px;
-  border-radius: var(--radius-md);
+  background: var(--danger-light);
+  border: 1px solid var(--danger-border);
+  color: var(--danger);
+  padding: 10px 12px;
   font-size: 13px;
-  line-height: 1.5;
-  margin-bottom: 16px;
+  line-height: 1.45;
+  margin-bottom: 14px;
 }
 
 .winnerSelectionArea {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .selectionLabel {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--text-main);
 }
 
 .bidderRadioList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 240px;
+  gap: 4px;
+  max-height: 220px;
   overflow-y: auto;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 10px;
+  padding: 6px;
 }
 
 .bidderRadioItem {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  border-radius: var(--radius-sm);
+  gap: 10px;
+  padding: 9px 10px;
   background: var(--bg-subtle);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background var(--transition);
   border: 1px solid transparent;
 }
 
-.bidderRadioItem:hover {
-  background: var(--primary-light);
-  border-color: var(--primary-border);
-}
+.bidderRadioItem:hover { background: var(--primary-light); }
+.selectedRadio { background: var(--primary-light); border-color: var(--primary-border); }
 
-.selectedRadio {
-  background: var(--primary-light);
-  border-color: var(--primary-border);
-}
-
-.candidateDetails {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+.candidateDetails { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 
 .highestPill {
-  background: #10b981;
-  color: #fff;
+  background: var(--success);
+  color: #ffffff;
   font-size: 10px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: var(--radius-full);
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
 }
 
 .candidateAmount {
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--primary);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
   font-variant-numeric: tabular-nums;
 }
 
 .overrideAlert {
-  background: #fef3c7;
-  border: 1px solid #fde68a;
+  background: #fffbeb;
+  border: 1px solid var(--warning-border);
   color: #92400e;
-  padding: 12px 14px;
-  border-radius: var(--radius-md);
+  padding: 10px 12px;
   font-size: 12px;
-  line-height: 1.5;
-  margin-top: 10px;
+  line-height: 1.45;
+  margin-top: 8px;
 }
 
 .modalActions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 24px;
-  padding-top: 16px;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 14px;
   border-top: 1px solid var(--border);
 }
 
-/* Anti-Sniping Extension Banner */
+/* Anti-snipe banner — informative, not theatrical */
 .antiSnipeBanner {
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-  border: 1px solid #f59e0b;
-  border-radius: var(--radius-lg);
-  padding: 14px 16px;
-  margin-bottom: 16px;
+  background: #fffbeb;
+  border: 1px solid var(--warning-border);
+  padding: 10px 14px;
+  margin-bottom: 12px;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  animation: pulseSnipe 2.5s infinite ease-in-out;
-}
-
-@keyframes pulseSnipe {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
-  }
-}
-
-.antiSnipeIcon {
-  font-size: 24px;
-}
-
-.antiSnipeTitle {
-  color: #b45309;
-  font-weight: 800;
-  font-size: 14px;
-  margin: 0 0 2px 0;
-}
-
-.antiSnipeDesc {
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
   color: #92400e;
-  font-size: 12px;
-  margin: 0;
-  line-height: 1.4;
 }
 
-/* Automatic Proxy Bidding Box */
+.antiSnipeIcon { font-size: 16px; }
+.antiSnipeTitle { color: #78350f; font-weight: 600; font-size: 13px; margin: 0 0 2px; }
+.antiSnipeDesc { color: #92400e; font-size: 12px; margin: 0; }
+
+/* Auto Bid Box */
 .autoBidBox {
-  margin-top: 16px;
-  padding: 16px;
+  padding: 14px;
   background: var(--bg-subtle);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
 }
 
 .autoBidHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .autoBidTitle {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-main);
   display: flex;
   align-items: center;
@@ -747,121 +627,110 @@
 }
 
 .autoBidActiveBadge {
-  background: #ecfdf5;
-  color: #047857;
-  border: 1px solid #a7f3d0;
+  background: var(--success-light);
+  color: var(--success);
+  border: 1px solid var(--success-border);
   font-size: 11px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
 }
 
 .autoBidDesc {
   font-size: 12px;
   color: var(--text-muted);
   line-height: 1.45;
-  margin: 0 0 12px 0;
+  margin: 0 0 10px;
 }
 
-.autoBidForm {
-  display: flex;
-  gap: 8px;
-}
+.autoBidForm { display: flex; gap: 8px; }
 
 .autoBidField {
   flex: 1;
-  padding: 9px 12px;
+  padding: 8px 10px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   background: #ffffff;
   color: var(--text-main);
   outline: none;
   font-variant-numeric: tabular-nums;
-  transition: all 0.2s ease;
+  transition: border-color var(--transition);
 }
 
 .autoBidField:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 
-/* Item Q&A Section */
+/* Q&A */
 .qaCard {
-  background: var(--bg-card);
+  background: #ffffff;
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 28px;
-  box-shadow: var(--shadow-sm);
+  padding: 20px;
 }
 
 .qaCardHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .qaHeading {
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--text-main);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
-  letter-spacing: -0.3px;
 }
 
 .qaSubtext {
   font-size: 13px;
   color: var(--text-muted);
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 }
 
 .qaList {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-bottom: 24px;
+  gap: 1px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
 }
 
 .qaItem {
-  background: var(--bg-subtle);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  transition: border-color 0.15s ease;
+  background: #ffffff;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
 }
 
-.qaItem:hover {
-  border-color: var(--border-hover);
-}
+.qaItem:last-child { border-bottom: none; }
 
 .questionRow {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
 }
 
 .qaAvatar {
-  font-size: 18px;
-  line-height: 1;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-full);
-  background: #ffffff;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-muted);
   border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 13px;
   flex-shrink: 0;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
-.questionContent {
-  flex: 1;
-}
+.questionContent { flex: 1; }
 
 .questionAuthorRow {
   display: flex;
@@ -871,43 +740,34 @@
   margin-bottom: 4px;
 }
 
-.questionAuthor {
-  font-weight: 700;
-  color: var(--text-main);
-}
-
+.questionAuthor { font-weight: 600; color: var(--text-body); }
 .questionText {
   font-size: 14px;
-  color: var(--text-main);
+  color: var(--text-body);
   margin: 0;
-  font-weight: 500;
   line-height: 1.5;
 }
 
 .answerRow {
-  margin-top: 12px;
+  margin-top: 10px;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  border-radius: var(--radius-md);
-  padding: 12px 14px;
+  gap: 10px;
+  background: var(--success-light);
+  border: 1px solid var(--success-border);
+  padding: 10px 12px;
+  margin-left: 38px;
 }
 
-.answerContent {
-  flex: 1;
-}
+.answerContent { flex: 1; }
 
 .answerAuthorRow {
   display: flex;
   justify-content: space-between;
   font-size: 11px;
-  color: #047857;
-  font-weight: 800;
+  color: var(--success);
+  font-weight: 600;
   margin-bottom: 3px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .answerText {
@@ -915,76 +775,64 @@
   color: #065f46;
   margin: 0;
   line-height: 1.5;
-  font-weight: 500;
 }
 
 .noAnswerPending {
-  margin-top: 10px;
+  margin-top: 8px;
   font-size: 12px;
   color: var(--text-muted);
   font-style: italic;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  margin-left: 38px;
 }
 
 .sellerReplyForm {
-  margin-top: 12px;
+  margin-top: 10px;
   display: flex;
   gap: 8px;
+  margin-left: 38px;
 }
 
 .sellerReplyInput {
   flex: 1;
-  padding: 8px 12px;
+  padding: 7px 10px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
   font-size: 13px;
   background: #ffffff;
   color: var(--text-main);
   outline: none;
+  transition: border-color var(--transition);
 }
 
-.sellerReplyInput:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
-}
+.sellerReplyInput:focus { border-color: var(--primary); }
 
 .askForm {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   border-top: 1px solid var(--border);
-  padding-top: 20px;
+  padding-top: 16px;
 }
 
 .askTextarea {
   width: 100%;
-  padding: 12px 14px;
+  padding: 10px 12px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
   font-size: 14px;
   resize: vertical;
-  min-height: 75px;
+  min-height: 70px;
   font-family: inherit;
-  background: var(--bg-subtle);
+  background: #ffffff;
   color: var(--text-main);
   outline: none;
-  transition: all 0.2s ease;
+  transition: border-color var(--transition);
 }
 
 .askTextarea:focus {
   border-color: var(--primary);
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 @media (max-width: 900px) {
-  .layout {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-  .bidCard {
-    position: static;
-  }
+  .layout { grid-template-columns: 1fr; gap: 20px; }
+  .bidCard { position: static; }
 }

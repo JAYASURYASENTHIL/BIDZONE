@@ -1,281 +1,241 @@
-/* Auth.module.css — Login & Signup shared styles */
+/* Auth — simple, clean sign-in card */
 
 .page {
   min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f8fafc;
-  background-image: 
-    radial-gradient(at 50% 0%, rgba(79, 70, 229, 0.08) 0px, transparent 60%),
-    radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.05) 0px, transparent 50%);
+  background: var(--bg-page);
   padding: 32px 16px;
 }
 
 .card {
   background: #ffffff;
-  border-radius: var(--radius-xl);
-  padding: 44px 38px;
-  width: 100%;
-  max-width: 440px;
   border: 1px solid var(--border);
-  box-shadow: 0 20px 35px -10px rgba(15, 23, 42, 0.07), 0 1px 3px rgba(15, 23, 42, 0.05);
+  padding: 36px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-sm);
 }
 
-/* ── Brand ───────────────────────────────────────────── */
+/* Brand */
 .brand {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .logo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, var(--primary), #818cf8);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--primary);
   color: #ffffff;
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
 .title {
-  font-size: 24px !important;
-  font-weight: 800 !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
   color: var(--text-main) !important;
-  margin: 0 0 4px !important;
-  letter-spacing: -0.5px;
+  margin: 0 0 3px !important;
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
   font-size: 12px;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-weight: 500;
   margin: 0;
 }
 
-/* ── Headings ─────────────────────────────────────────── */
+/* Headings */
 .heading {
-  font-size: 20px !important;
-  font-weight: 800 !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
   color: var(--text-main) !important;
-  margin: 0 0 6px !important;
+  margin: 0 0 4px !important;
   text-align: center;
-  letter-spacing: -0.4px;
 }
 
 .subheading {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-muted);
   text-align: center;
-  margin: 0 0 24px;
+  margin: 0 0 20px;
 }
 
-/* ── Error banner ─────────────────────────────────────── */
+/* Error */
 .errorBanner {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
   background: var(--danger-light);
-  border: 1px solid #fecaca;
-  border-radius: var(--radius-md);
-  padding: 12px 14px;
-  margin-bottom: 20px;
+  border: 1px solid var(--danger-border);
+  padding: 10px 12px;
+  margin-bottom: 16px;
   font-size: 13px;
   color: var(--danger);
   line-height: 1.45;
-  font-weight: 500;
 }
 
 .errorIcon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: var(--radius-full);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
   background: var(--danger);
   color: #fff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   flex-shrink: 0;
   margin-top: 1px;
 }
 
-/* ── Form ────────────────────────────────────────────── */
+/* Form */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .label {
   font-size: 13px;
-  font-weight: 700;
-  color: var(--text-main);
-  letter-spacing: -0.1px;
+  font-weight: 500;
+  color: var(--text-body);
 }
 
 .input {
-  padding: 12px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-md);
+  padding: 9px 12px;
+  border: 1px solid var(--border);
   font-size: 14px;
   color: var(--text-main);
-  background: var(--bg-subtle);
+  background: #ffffff;
   outline: none;
   width: 100%;
   box-sizing: border-box;
   font-family: inherit;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 
 .input:focus {
   border-color: var(--primary);
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  background: var(--bg-subtle);
 }
 
 .hint {
   font-size: 12px;
   color: var(--text-muted);
-  margin: 3px 0 0;
 }
 
-/* ── Password strength ───────────────────────────────── */
+/* Password strength */
 .strengthRow {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 6px;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .strengthBar {
   flex: 1;
-  height: 5px;
+  height: 3px;
   background: var(--border);
-  border-radius: var(--radius-full);
   overflow: hidden;
 }
 
 .strengthFill {
   height: 100%;
-  border-radius: var(--radius-full);
-  transition: width 0.3s ease, background 0.3s ease;
+  transition: width 0.25s ease, background 0.25s ease;
 }
 
 .strengthLabel {
   font-size: 12px;
-  font-weight: 700;
-  min-width: 44px;
+  font-weight: 600;
+  min-width: 40px;
   text-align: right;
-  text-transform: capitalize;
 }
 
 .s1 .strengthFill, .s1.strengthFill { background: #ef4444; }
 .s2 .strengthFill, .s2.strengthFill { background: #f97316; }
 .s3 .strengthFill, .s3.strengthFill { background: #eab308; }
-.s4 .strengthFill, .s4.strengthFill { background: #10b981; }
+.s4 .strengthFill, .s4.strengthFill { background: #16a34a; }
 .s1.strengthLabel { color: #ef4444; }
 .s2.strengthLabel { color: #f97316; }
 .s3.strengthLabel { color: #eab308; }
-.s4.strengthLabel { color: #10b981; }
+.s4.strengthLabel { color: #16a34a; }
 
-/* ── Submit button ───────────────────────────────────── */
+/* Submit */
 .btn {
-  margin-top: 6px;
-  padding: 13px 18px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  margin-top: 4px;
+  padding: 10px 16px;
+  background: var(--primary);
   color: #ffffff;
   border: none;
-  border-radius: var(--radius-md);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background var(--transition);
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 46px;
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+  min-height: 42px;
 }
 
-.btn:hover:not(:disabled) {
-  opacity: 0.95;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
-}
+.btn:hover:not(:disabled) { background: var(--primary-hover); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
-.btn:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.btn:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* ── Spinner ─────────────────────────────────────────── */
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+/* Spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .spinner {
   display: inline-block;
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: #ffffff;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
 
-/* ── Switch link ──────────────────────────────────────── */
+/* Switch */
 .switchText {
-  margin-top: 22px;
+  margin-top: 16px;
   text-align: center;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-muted);
 }
 
 .link {
   color: var(--primary);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: color 0.15s ease;
 }
 
-.link:hover {
-  color: var(--primary-hover);
-  text-decoration: underline;
-}
+.link:hover { text-decoration: underline; }
 
-/* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 480px) {
-  .card {
-    padding: 32px 22px;
-    border-radius: var(--radius-lg);
-  }
+  .card { padding: 24px 20px; }
 }

@@ -43,20 +43,14 @@ export default function CountdownTimer({ closingAt, status }) {
     return (
       <span
         style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '5px',
+          display: 'inline-block',
           fontSize: '11px',
-          fontWeight: '600',
-          color: '#64748b',
-          backgroundColor: '#f1f5f9',
-          border: '1px solid #e2e8f0',
-          padding: '3px 8px',
-          borderRadius: 'var(--radius-sm)',
-          letterSpacing: '0.02em',
+          fontWeight: '500',
+          color: '#6b7280',
+          padding: '2px 0',
         }}
       >
-        <span style={{ fontSize: '12px' }}>⏱️</span> Ended
+        Ended
       </span>
     );
   }
@@ -66,23 +60,14 @@ export default function CountdownTimer({ closingAt, status }) {
   return (
     <span
       style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '5px',
-        fontSize: '11px',
-        fontWeight: '700',
+        display: 'inline-block',
+        fontSize: '12px',
+        fontWeight: '600',
         fontVariantNumeric: 'tabular-nums',
-        letterSpacing: '0.02em',
-        color: isUrgent ? '#b91c1c' : '#4338ca',
-        backgroundColor: isUrgent ? '#fef2f2' : '#eef2ff',
-        border: `1px solid ${isUrgent ? '#fecaca' : '#c7d2fe'}`,
-        padding: '3px 8px',
-        borderRadius: 'var(--radius-sm)',
-        boxShadow: isUrgent ? '0 0 0 1px rgba(239, 68, 68, 0.15)' : 'none',
-        transition: 'all 0.2s ease',
+        color: isUrgent ? '#dc2626' : '#374151',
+        padding: '2px 0',
       }}
     >
-      <span style={{ fontSize: '12px' }}>{isUrgent ? '🔥' : '⏱️'}</span>
       {timeLeft}
     </span>
   );

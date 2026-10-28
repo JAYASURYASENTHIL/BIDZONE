@@ -1,111 +1,60 @@
-/* ==========================================================================
-   Explore Marketplace Page Styles
-   ========================================================================== */
+/* Explore Marketplace — practical shopping interface */
 
 .page {
   display: flex;
   flex-direction: column;
-  gap: 36px;
-  padding-bottom: 64px;
+  padding-bottom: 60px;
 }
 
-/* Modern Hero Search Banner */
+/* ── Compact search + filter area — no giant hero ─────── */
 .hero {
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
-  color: #ffffff;
-  padding: 64px 0 72px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  position: relative;
-  overflow: hidden;
-}
-
-.hero::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 800px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
-  pointer-events: none;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+  padding: 20px 0;
 }
 
 .heroContent {
-  max-width: 720px;
-  margin: 0 auto;
-  text-align: center;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 16px;
-  position: relative;
-  z-index: 1;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.badge {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 5px 14px;
-  border-radius: var(--radius-full);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #c7d2fe;
-}
-
-.headline {
-  font-size: 40px;
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -0.03em;
-  color: #ffffff;
-}
-
-.subheadline {
-  font-size: 16px;
-  color: #cbd5e1;
-  line-height: 1.55;
-  max-width: 580px;
-}
-
-/* Floating Search Bar */
+/* Inline search bar — functional, not theatrical */
 .searchBox {
   display: flex;
   align-items: center;
-  width: 100%;
-  max-width: 580px;
+  flex: 1;
+  min-width: 260px;
+  max-width: 540px;
   background: #ffffff;
-  border-radius: var(--radius-full);
-  padding: 6px 8px 6px 20px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
-  margin-top: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 
 .searchBox:focus-within {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(99, 102, 241, 0.3);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .searchIcon {
-  font-size: 16px;
-  margin-right: 10px;
-  color: var(--text-muted);
+  padding: 0 10px 0 12px;
+  color: var(--text-subtle);
+  font-size: 14px;
+  line-height: 1;
 }
 
 .searchInput {
   flex: 1;
   border: none;
   background: transparent;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--text-main);
   outline: none;
-  padding: 6px 0;
+  padding: 9px 0;
+  min-width: 0;
 }
 
 .searchInput::placeholder {
@@ -113,75 +62,86 @@
 }
 
 .searchBtn {
-  border-radius: var(--radius-full);
-  padding: 10px 22px;
-  font-weight: 700;
+  border-radius: 0;
+  border-left: 1px solid var(--border);
+  padding: 9px 16px;
+  font-weight: 600;
   font-size: 13px;
-  letter-spacing: 0.02em;
+  background: var(--bg-subtle);
+  color: var(--text-body);
+  transition: background var(--transition);
 }
 
-/* Category Filter Tabs Bar */
+.searchBtn:hover {
+  background: var(--bg-muted);
+  color: var(--text-main);
+}
+
+/* No badge / headline / subheadline in the hero */
+.badge,
+.headline,
+.subheadline {
+  display: none;
+}
+
+/* ── Category Tabs ───────────────────────────────────── */
 .categoryBar {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   overflow-x: auto;
-  padding-bottom: 8px;
-  margin-bottom: 24px;
+  padding: 14px 0 0;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
-.categoryBar::-webkit-scrollbar {
-  display: none;
-}
+.categoryBar::-webkit-scrollbar { display: none; }
 
 .categoryPill {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 18px;
-  border-radius: var(--radius-full);
-  background: var(--bg-card);
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  background: #ffffff;
   border: 1px solid var(--border);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-body);
   cursor: pointer;
   white-space: nowrap;
-  transition: all var(--transition-fast);
-  box-shadow: var(--shadow-xs);
+  transition: all var(--transition);
 }
 
 .categoryPill:hover {
   border-color: var(--border-hover);
-  background-color: var(--bg-subtle);
   color: var(--text-main);
-  transform: translateY(-1px);
+  background: var(--bg-subtle);
 }
 
 .activePill {
-  background: var(--primary-gradient);
+  background: var(--primary);
   color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 4px 12px rgba(67, 56, 202, 0.3);
-  font-weight: 700;
+  border-color: var(--primary);
+  font-weight: 600;
 }
 
 .activePill:hover {
-  background: linear-gradient(135deg, #4338ca 0%, #312e81 100%);
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
   color: #ffffff;
-  transform: translateY(-1px);
 }
 
-/* Sort & Condition Filter Bar */
+/* ── Sort + filter row ──────────────────────────────── */
 .filterRow {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 16px;
-  margin-bottom: 24px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 0 12px;
   flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
 }
 
 .filterGroup {
@@ -192,82 +152,70 @@
 
 .filterLabel {
   font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-weight: 500;
   color: var(--text-muted);
 }
 
 .selectInput {
-  background: var(--bg-card);
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 8px 14px;
+  padding: 6px 10px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-main);
   outline: none;
   cursor: pointer;
-  transition: all var(--transition-fast);
-  box-shadow: var(--shadow-xs);
+  transition: border-color var(--transition);
 }
 
-.selectInput:hover {
-  border-color: var(--border-hover);
-}
-
+.selectInput:hover { border-color: var(--border-hover); }
 .selectInput:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 
-/* Catalog Product Grid */
+/* ── Product Grid ────────────────────────────────────── */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 24px;
-}
-
-/* Loading Skeletons */
-.skeletonCard {
-  aspect-ratio: 4 / 5;
-  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: var(--radius-lg);
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1px;
+  background-color: var(--border);
   border: 1px solid var(--border);
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+/* ── Skeleton ────────────────────────────────────────── */
+.skeletonCard {
+  aspect-ratio: 3 / 4;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
 }
 
-/* Empty & Error States */
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Empty / Error ───────────────────────────────────── */
 .emptyState {
   text-align: center;
-  padding: 64px 24px;
-  background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  border: 1px dashed var(--border);
-  max-width: 540px;
+  padding: 60px 24px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  max-width: 480px;
   margin: 0 auto;
-  box-shadow: var(--shadow-xs);
 }
 
 .emptyIcon {
-  font-size: 44px;
+  font-size: 32px;
   margin-bottom: 12px;
   display: block;
 }
 
 .emptyTitle {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--text-main);
   margin-bottom: 6px;
 }
@@ -282,26 +230,20 @@
   background: var(--danger-light);
   border: 1px solid var(--danger-border);
   color: var(--danger);
-  padding: 24px;
+  padding: 16px;
   border-radius: var(--radius-md);
   text-align: center;
-  font-weight: 600;
-  max-width: 540px;
+  font-weight: 500;
+  font-size: 14px;
+  max-width: 480px;
   margin: 0 auto;
 }
 
 @media (max-width: 768px) {
-  .hero {
-    padding: 44px 0 52px;
-  }
-  .headline {
-    font-size: 30px;
-  }
-  .subheadline {
-    font-size: 14px;
-  }
+  .hero { padding: 14px 0; }
+  .heroContent { flex-direction: column; align-items: stretch; }
+  .searchBox { max-width: 100%; }
   .grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   }
 }

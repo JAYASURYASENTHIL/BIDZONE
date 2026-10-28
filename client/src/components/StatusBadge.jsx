@@ -1,46 +1,32 @@
 export default function StatusBadge({ status }) {
   const configs = {
-    active: { label: 'Active', bg: '#ecfdf5', text: '#059669', border: '#a7f3d0', dot: '#10b981' },
-    pending_seller_decision: { label: 'Decision Needed', bg: '#fffbeb', text: '#b45309', border: '#fde68a', dot: '#f59e0b' },
-    approved: { label: 'Approved', bg: '#eff6ff', text: '#1d4ed8', border: '#bfdbfe', dot: '#3b82f6' },
-    handover_pending: { label: 'Handover Pending', bg: '#f5f3ff', text: '#6d28d9', border: '#ddd6fe', dot: '#8b5cf6' },
-    completed: { label: 'Completed', bg: '#f0fdf4', text: '#15803d', border: '#bbf7d0', dot: '#22c55e' },
-    rejected: { label: 'Rejected', bg: '#fef2f2', text: '#b91c1c', border: '#fecaca', dot: '#ef4444' },
-    cancelled: { label: 'Cancelled', bg: '#f8fafc', text: '#64748b', border: '#e2e8f0', dot: '#94a3b8' },
-    unsold: { label: 'Unsold', bg: '#f1f5f9', text: '#475569', border: '#cbd5e1', dot: '#64748b' },
-    pickup_failed: { label: 'Pickup Failed', bg: '#fff1f2', text: '#be123c', border: '#fecdd3', dot: '#f43f5e' },
+    active:                  { label: 'Active',           bg: '#f0fdf4', text: '#15803d', border: '#bbf7d0' },
+    pending_seller_decision: { label: 'Decision Needed',  bg: '#fffbeb', text: '#92400e', border: '#fde68a' },
+    approved:                { label: 'Approved',          bg: '#eff6ff', text: '#1e40af', border: '#bfdbfe' },
+    handover_pending:        { label: 'Handover Pending', bg: '#faf5ff', text: '#6b21a8', border: '#e9d5ff' },
+    completed:               { label: 'Completed',        bg: '#f0fdf4', text: '#166534', border: '#bbf7d0' },
+    rejected:                { label: 'Rejected',         bg: '#fef2f2', text: '#991b1b', border: '#fecaca' },
+    cancelled:               { label: 'Cancelled',        bg: '#f9fafb', text: '#6b7280', border: '#e5e7eb' },
+    unsold:                  { label: 'Unsold',           bg: '#f9fafb', text: '#6b7280', border: '#e5e7eb' },
+    pickup_failed:           { label: 'Pickup Failed',    bg: '#fef2f2', text: '#991b1b', border: '#fecaca' },
   };
 
-  const current = configs[status] || { label: status, bg: '#f1f5f9', text: '#475569', border: '#cbd5e1', dot: '#94a3b8' };
+  const current = configs[status] || { label: status, bg: '#f9fafb', text: '#6b7280', border: '#e5e7eb' };
 
   return (
     <span
       style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '5px',
+        display: 'inline-block',
         fontSize: '11px',
-        fontWeight: '700',
-        textTransform: 'uppercase',
-        letterSpacing: '0.04em',
-        padding: '3px 9px',
-        borderRadius: 'var(--radius-full)',
+        fontWeight: '600',
+        padding: '2px 7px',
+        borderRadius: '4px',
         backgroundColor: current.bg,
         color: current.text,
         border: `1px solid ${current.border}`,
-        boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
         whiteSpace: 'nowrap',
       }}
     >
-      <span
-        style={{
-          width: '6px',
-          height: '6px',
-          borderRadius: '50%',
-          backgroundColor: current.dot,
-          display: 'inline-block',
-        }}
-      />
       {current.label}
     </span>
   );
