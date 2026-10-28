@@ -1,10 +1,12 @@
 import Navbar from './Navbar.jsx';
+import ChatBot from './ChatBot.jsx';
 
 export default function AppShell({ children }) {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
       <main style={{ flex: 1, paddingBottom: '60px' }}>{children}</main>
+      <ChatBot />
       <footer
         style={{
           borderTop: '1px solid var(--border)',

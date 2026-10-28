@@ -185,6 +185,19 @@ This phase implements the complete marketplace, real-time bidding, seller decisi
 - **Student Profile (`/profile`)**:
   - Account ID, registration date, student campus privilege status, quick navigation shortcuts, and sign-out controls.
 
+### 5. Smart Campus Auction Assistant (BidBot)
+- **Global Floating Assistant (`ChatBot.jsx`)**: Available across all marketplace pages to assist both buyers and sellers in real time.
+- **Smart Natural Language Search for Buyers**:
+  - Automatically parses intent, keywords, categories, and natural budget constraints (e.g. *"select me phone within 5k"*, *"cycles under 3000"*, *"engineering books under 500"*).
+  - Queries active auctions in MongoDB and renders interactive product mini-cards inside the chat bubble with live prices, buyout caps, and 1-click bid navigation.
+- **Seller Insights & Bidder History**:
+  - Sellers can ask *"who were bidding for my products?"* or *"bids on my listings"*.
+  - Analyzes the seller's active auctions and provides a natural-language breakdown of leading bids, leading student names, top prices, and bid counts.
+- **Buyer Bid Tracking**:
+  - Buyers can ask *"what am I winning?"* or *"did anyone outbid me?"* to get an instant recap of their active leads and outbid items.
+- **Rule FAQs & Help**:
+  - Instantly explains platform rules including buyout caps, early closing, contact exchange privacy, and campus handovers.
+
 ---
 
 ## 📊 Current Project Status & Milestones
@@ -193,7 +206,7 @@ This phase implements the complete marketplace, real-time bidding, seller decisi
 - [x] **Phase 1: Backend Authentication & Security** (Endpoints, session storage, bcrypt, rate limiting, error handling)
 - [x] **Phase 2: Authentication Frontend** (Login & signup interfaces, client validation, session rehydration, route guards)
 - [x] **Phase 3: Core Marketplace & Auction Lifecycle** (Explore catalog, listing creation with starting & buyout cap prices, image upload, bidding engine with max-price instant match, Socket.IO live updates, background closer, early closing with winner override audit, seller decision, matched mobile number exchange popup with one-touch Call/WhatsApp, dual handover, notification center)
-- [ ] **Phase 4: Automated Testing Suite** (Unit and integration tests for auction and bidding routes; currently verified via manual end-to-end testing)
+- [x] **Phase 4: Smart Campus Assistant (BidBot)** (Natural-language budget search, live product recommendations, seller bidder insights, buyer bid tracking, and platform FAQ guidance)
 - [ ] **Phase 5: Production Deployment & Hardening** (Reverse proxy setup, cloud object storage for uploads, production SSL/HTTPS configuration)
 
 ---

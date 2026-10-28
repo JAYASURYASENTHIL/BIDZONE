@@ -107,3 +107,11 @@ export const notificationApi = {
   markAsRead: (id) => request(`/notifications/${id}/read`, { method: 'PATCH' }),
   markAllAsRead: () => request('/notifications/read-all', { method: 'PATCH' }),
 };
+
+export const chatApi = {
+  sendMessage: (message) =>
+    request('/chat/message', {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    }),
+};
