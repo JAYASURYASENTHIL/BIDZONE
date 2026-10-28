@@ -127,3 +127,67 @@ NODE_ENV=development
 ## 👨‍💻 Author
 
 **JAYASURYASENTHIL** — jayasuryas.23aim@kongu.edu
+
+
+
+## Phase 2 — Authentication UI
+
+### Overview
+Built the initial React authentication interface for BIDZONE, a campus auction marketplace. This phase connects the frontend authentication experience to the existing Express backend.
+
+### Features
+Document only features that are actually implemented and verified, such as:
+- Student signup page
+- Student login page
+- Form validation and error feedback
+- Loading and success states
+- Session-cookie-based authentication
+- Persistent login state after page refresh
+- Logout functionality
+- Protected frontend routes
+- Responsive authentication layouts
+- Integration with existing backend authentication endpoints
+
+Inspect the code before marking each feature as completed. If a feature is incomplete or unverified, mark it as pending instead of claiming it works.
+
+### Tech Stack
+- React
+- Vite
+- JavaScript
+- React Router, if used
+- Existing Node.js and Express authentication API
+- MongoDB Atlas and Mongoose on the backend
+
+### Authentication Flow
+Explain the actual implemented flow:
+1. Student registers or logs in.
+2. Frontend sends the request to the backend.
+3. Backend validates credentials and manages the session.
+4. Frontend retrieves the authenticated user's profile.
+5. Authenticated users can access protected routes.
+6. Logout invalidates the session and updates the UI.
+
+Correct this description to match the actual implementation if needed.
+
+### Project Structure
+Show the actual relevant frontend file structure discovered in the repository. Do not invent filenames or directories.
+
+### Running Locally
+Document the commands needed to run the backend and frontend in separate terminals, using the actual scripts in the project's package.json files.
+
+Explain any required environment variables using their names only. Never include secrets, database credentials, or actual session secrets.
+
+### Verification
+Include a checklist for signup, login, page refresh, logout, invalid credentials, and protected-route access. Mark tests as passed only if there is evidence that they were executed successfully.
+
+### Development Roadmap
+Add the following upcoming milestones:
+- Phase 3: Marketplace UI and auction listings
+- Phase 4: Bidding engine and public bid history
+- Phase 5: Auction closing, seller decisions, and handover
+- Phase 6: Buyer and seller dashboards connected to real data
+- Phase 7: Notifications and final UI polish
+
+These are planned features, not completed features.
+
+Keep the README concise, polished, accurate, and suitable for a public GitHub repository. Inspect the current codebase, update the README, and summarize the changes made. Do not commit or push anything to GitHub unless explicitly asked.
