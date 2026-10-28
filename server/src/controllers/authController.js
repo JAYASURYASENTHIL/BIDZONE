@@ -29,13 +29,21 @@ export const signup = async (req, res, next) => {
       passwordHash,
     });
 
-    // Establish session immediately after signup
-    req.session.userId = user._id.toString();
+    // Regenerate session ID (prevents session fixation) then persist before responding
+    req.session.regenerate((regenErr) => {
+      if (regenErr) return next(regenErr);
 
-    return res.status(201).json({
-      success: true,
-      message: 'Account created successfully.',
-      user: user.toSafeObject(),
+      req.session.userId = user._id.toString();
+
+      req.session.save((saveErr) => {
+        if (saveErr) return next(saveErr);
+
+        return res.status(201).json({
+          success: true,
+          message: 'Account created successfully.',
+          user: user.toSafeObject(),
+        });
+      });
     });
   } catch (err) {
     next(err);
@@ -71,10 +79,15 @@ export const login = async (req, res, next) => {
 
       req.session.userId = user._id.toString();
 
-      res.status(200).json({
-        success: true,
-        message: 'Logged in successfully.',
-        user: user.toSafeObject(),
+      // Explicitly save before responding to guarantee cookie is set
+      req.session.save((saveErr) => {
+        if (saveErr) return next(saveErr);
+
+        res.status(200).json({
+          success: true,
+          message: 'Logged in successfully.',
+          user: user.toSafeObject(),
+        });
       });
     });
   } catch (err) {
