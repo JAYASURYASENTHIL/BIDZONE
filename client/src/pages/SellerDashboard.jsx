@@ -143,6 +143,22 @@ export default function SellerDashboard() {
                   <tr key={item._id}>
                     <td className={styles.itemTitleCell}>
                       <Link to={`/auction/${item._id}`}>{item.title}</Link>
+                      {item.closedEarly && (
+                        <span
+                          title="Closed early by seller"
+                          style={{
+                            fontSize: '11px',
+                            background: '#fef3c7',
+                            color: '#b45309',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            marginLeft: '8px',
+                            fontWeight: '600',
+                          }}
+                        >
+                          ⚡ Closed Early
+                        </span>
+                      )}
                     </td>
                     <td style={{ fontWeight: '700', color: 'var(--primary)' }}>₹{item.currentBid}</td>
                     <td>{item.winner?.name || 'A Student'}</td>
@@ -203,6 +219,39 @@ export default function SellerDashboard() {
                   <tr key={item._id}>
                     <td className={styles.itemTitleCell}>
                       <Link to={`/auction/${item._id}`}>{item.title}</Link>
+                      {item.bidCount > 0 ? (
+                        <span
+                          title="Listing details permanently locked after first accepted bid"
+                          style={{
+                            fontSize: '11px',
+                            background: '#fef3c7',
+                            color: '#92400e',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                            marginLeft: '8px',
+                            fontWeight: '500',
+                          }}
+                        >
+                          🔒 Terms Locked
+                        </span>
+                      ) : (
+                        <span
+                          title="Editable until first bid is placed"
+                          style={{
+                            fontSize: '11px',
+                            background: '#f0fdf4',
+                            color: '#166534',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            marginLeft: '8px',
+                          }}
+                        >
+                          ✏️ Editable
+                        </span>
+                      )}
                     </td>
                     <td>₹{item.startingPrice}</td>
                     <td style={{ fontWeight: '700', color: 'var(--primary)' }}>
@@ -212,15 +261,32 @@ export default function SellerDashboard() {
                     <td>
                       <CountdownTimer closingAt={item.closingAt} status={item.status} />
                     </td>
-                    <td>
-                      <button
-                        onClick={() => handleCancelAuction(item._id)}
+                    <td style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <Link
+                        to={`/auction/${item._id}`}
                         className="btn btn-secondary"
-                        style={{ fontSize: '12px', padding: '5px 10px', color: 'var(--danger)' }}
-                        disabled={actionLoading}
+                        style={{
+                          fontSize: '12px',
+                          padding: '5px 10px',
+                          color: '#b45309',
+                          borderColor: '#f59e0b',
+                          background: '#fffbeb',
+                          textDecoration: 'none',
+                        }}
+                        title="Close this auction early and select a winner"
                       >
-                        Cancel
-                      </button>
+                        ⚡ Close Early
+                      </Link>
+                      {item.bidCount === 0 && (
+                        <button
+                          onClick={() => handleCancelAuction(item._id)}
+                          className="btn btn-secondary"
+                          style={{ fontSize: '12px', padding: '5px 10px', color: 'var(--danger)' }}
+                          disabled={actionLoading}
+                        >
+                          Cancel
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -294,6 +360,20 @@ export default function SellerDashboard() {
                   <tr key={item._id}>
                     <td className={styles.itemTitleCell}>
                       <Link to={`/auction/${item._id}`}>{item.title}</Link>
+                      {item.closedEarly && (
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            background: '#fef3c7',
+                            color: '#b45309',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            marginLeft: '8px',
+                          }}
+                        >
+                          ⚡ Early Close
+                        </span>
+                      )}
                     </td>
                     <td style={{ fontWeight: '700', color: 'var(--success)' }}>₹{item.currentBid}</td>
                     <td>{item.winner?.name || 'A Student'}</td>
@@ -329,6 +409,20 @@ export default function SellerDashboard() {
                   <tr key={item._id}>
                     <td className={styles.itemTitleCell}>
                       <Link to={`/auction/${item._id}`}>{item.title}</Link>
+                      {item.closedEarly && (
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            background: '#fef3c7',
+                            color: '#b45309',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            marginLeft: '8px',
+                          }}
+                        >
+                          ⚡ Closed Early (0 Bids)
+                        </span>
+                      )}
                     </td>
                     <td>₹{item.startingPrice}</td>
                     <td>

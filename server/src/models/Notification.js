@@ -19,6 +19,8 @@ const notificationSchema = new mongoose.Schema(
         'seller_rejected',
         'handover_update',
         'listing_cancelled',
+        'max_price_hit',
+        'contact_shared',
       ],
     },
     title: {

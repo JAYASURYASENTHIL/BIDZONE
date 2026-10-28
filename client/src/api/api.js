@@ -75,6 +75,11 @@ export const auctionApi = {
       method: 'POST',
       body: JSON.stringify({ amount }),
     }),
+  closeEarly: (id, data) =>
+    request(`/auctions/${id}/close-early`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
   decide: (id, decision) =>
     request(`/auctions/${id}/decide`, {
       method: 'POST',
@@ -84,6 +89,11 @@ export const auctionApi = {
     request(`/auctions/${id}/handover`, {
       method: 'POST',
       body: JSON.stringify({}),
+    }),
+  sharePhone: (id, phone) =>
+    request(`/auctions/${id}/contact-phone`, {
+      method: 'POST',
+      body: JSON.stringify({ phone }),
     }),
 };
 

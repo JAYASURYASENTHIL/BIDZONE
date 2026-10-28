@@ -7,9 +7,10 @@ export const startAuctionCloser = (io) => {
     try {
       const now = new Date();
 
-      // Find active auctions whose closing time has passed
+      // Find active auctions whose scheduled closing time has passed and were not closed early
       const expiredAuctions = await Auction.find({
         status: 'active',
+        closedEarly: { $ne: true },
         closingAt: { $lte: now },
       });
 
@@ -17,6 +18,7 @@ export const startAuctionCloser = (io) => {
         if (auction.bidCount === 0) {
           // No bids -> mark as unsold
           auction.status = 'unsold';
+          auction.winnerSelectionMethod = 'none';
           await auction.save();
 
           await Notification.create({
@@ -27,12 +29,15 @@ export const startAuctionCloser = (io) => {
             data: { auctionId: auction._id },
           });
         } else {
-          // Has bids -> find leading bid and set to pending_seller_decision
+          // Has bids -> find leading bid and set to pending_seller_decision with automatic_highest
           const leadingBid = await Bid.findOne({ auction: auction._id, isLeading: true });
 
           if (leadingBid) {
             auction.status = 'pending_seller_decision';
             auction.winner = leadingBid.bidder;
+            auction.winnerSelectionMethod = 'automatic_highest';
+            auction.selectedWinningBid = leadingBid._id;
+            auction.selectedWinningAmount = leadingBid.amount;
             await auction.save();
 
             // Notify seller to review & approve
@@ -40,8 +45,8 @@ export const startAuctionCloser = (io) => {
               recipient: auction.seller,
               type: 'auction_closed',
               title: 'Auction Ended — Decision Required',
-              message: `Your auction for "${auction.title}" ended with a top bid of ₹${leadingBid.amount}. Please review and approve or reject.`,
-              data: { auctionId: auction._id, amount: leadingBid.amount },
+              message: `Your auction for "${auction.title}" ended at scheduled deadline with a top bid of ₹${leadingBid.amount}. Please review and approve or reject.`,
+              data: { auctionId: auction._id, amount: leadingBid.amount, selectionMethod: 'automatic_highest' },
             });
 
             // Notify winning bidder
@@ -50,10 +55,11 @@ export const startAuctionCloser = (io) => {
               type: 'auction_won',
               title: 'You are the Top Bidder! 🏆',
               message: `The auction for "${auction.title}" ended with your leading bid of ₹${leadingBid.amount}. Awaiting seller approval.`,
-              data: { auctionId: auction._id, amount: leadingBid.amount },
+              data: { auctionId: auction._id, amount: leadingBid.amount, selectionMethod: 'automatic_highest' },
             });
           } else {
             auction.status = 'unsold';
+            auction.winnerSelectionMethod = 'none';
             await auction.save();
           }
         }
@@ -63,6 +69,7 @@ export const startAuctionCloser = (io) => {
           io.to(`auction:${auction._id}`).emit('auction:status', {
             auctionId: auction._id,
             status: auction.status,
+            winnerSelectionMethod: auction.winnerSelectionMethod,
           });
         }
       }

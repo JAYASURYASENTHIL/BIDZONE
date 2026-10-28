@@ -11,6 +11,7 @@ export default function SellPage() {
   const [condition, setCondition] = useState('good');
   const [description, setDescription] = useState('');
   const [startingPrice, setStartingPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [minIncrement, setMinIncrement] = useState('10');
 
   // Default closing time: 3 days from now
@@ -49,18 +50,23 @@ export default function SellPage() {
     e.preventDefault();
     setError('');
 
-    if (!title.trim() || !description.trim() || !startingPrice || !closingAt) {
-      setError('Please fill out all required fields.');
-      return;
-    }
-
-    if (new Date(closingAt) <= new Date()) {
-      setError('Closing date must be in the future.');
+    if (!title.trim() || !description.trim() || !startingPrice || !maxPrice || !closingAt) {
+      setError('Please fill out all required fields, including starting price and max price.');
       return;
     }
 
     if (Number(startingPrice) < 1) {
       setError('Starting price must be at least ₹1.');
+      return;
+    }
+
+    if (Number(maxPrice) <= Number(startingPrice)) {
+      setError('Maximum price must be strictly greater than the starting price (e.g. Starting: ₹500, Max Cap: ₹1200).');
+      return;
+    }
+
+    if (new Date(closingAt) <= new Date()) {
+      setError('Closing date must be in the future.');
       return;
     }
 
@@ -73,6 +79,7 @@ export default function SellPage() {
       formData.append('condition', condition);
       formData.append('description', description.trim());
       formData.append('startingPrice', startingPrice);
+      formData.append('maxPrice', maxPrice);
       formData.append('minIncrement', minIncrement || '10');
       formData.append('closingAt', closingAt);
 
@@ -94,7 +101,7 @@ export default function SellPage() {
       <div className={styles.header}>
         <h1 className={styles.title}>List an Item for Auction</h1>
         <p className={styles.subtitle}>
-          Set a starting price and deadline. Verified students across campus can bid on your gear!
+          Set a starting price, max buyout ceiling, and deadline. Verified students across campus can bid on your gear!
         </p>
       </div>
 
@@ -225,6 +232,24 @@ export default function SellPage() {
                 className={styles.input}
                 required
               />
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label}>
+                Max Price / Ceiling (₹) <span className={styles.required}>*</span>
+              </label>
+              <input
+                type="number"
+                placeholder="e.g. 1500 (Instant buyout cap)"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                min={Number(startingPrice) ? Number(startingPrice) + 1 : 1}
+                className={styles.input}
+                required
+              />
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
+                ⚡ When hit, bidding completes immediately and matches buyer.
+              </span>
             </div>
 
             <div className={styles.field}>

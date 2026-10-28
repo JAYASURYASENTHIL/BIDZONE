@@ -49,7 +49,14 @@ export default function AuctionCard({ auction }) {
             <span className={styles.priceLabel}>
               {isBidPlaced ? 'Current Bid' : 'Starting Price'}
             </span>
-            <div className={styles.price}>₹{highestPrice}</div>
+            <div className={styles.price}>
+              ₹{highestPrice}
+              {auction.maxPrice && (
+                <span style={{ fontSize: '11px', color: '#b45309', marginLeft: '6px', fontWeight: 'normal' }}>
+                  / Max ₹{auction.maxPrice}
+                </span>
+              )}
+            </div>
           </div>
 
           <div className={styles.bidsBadge}>

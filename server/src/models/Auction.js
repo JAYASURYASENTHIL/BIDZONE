@@ -38,6 +38,22 @@ const auctionSchema = new mongoose.Schema(
       required: [true, 'Starting price is required'],
       min: [1, 'Starting price must be at least 1'],
     },
+    maxPrice: {
+      type: Number,
+      required: [true, 'Maximum price is required'],
+      min: [1, 'Maximum price must be at least 1'],
+      validate: {
+        validator: function (val) {
+          if (val == null) return true;
+          return val > this.startingPrice;
+        },
+        message: 'Maximum price must be strictly greater than starting price',
+      },
+    },
+    hitMaxPrice: {
+      type: Boolean,
+      default: false,
+    },
     minIncrement: {
       type: Number,
       required: [true, 'Minimum increment is required'],
@@ -76,10 +92,42 @@ const auctionSchema = new mongoose.Schema(
       ref: 'User',
       default: null,
     },
+    // Early closing metadata
+    closedEarly: {
+      type: Boolean,
+      default: false,
+    },
+    closedEarlyAt: {
+      type: Date,
+      default: null,
+    },
+    closedEarlyBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+    winnerSelectionMethod: {
+      type: String,
+      enum: ['automatic_highest', 'seller_selected', 'none'],
+      default: 'automatic_highest',
+    },
+    selectedWinningBid: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Bid',
+      default: null,
+    },
+    selectedWinningAmount: {
+      type: Number,
+      default: null,
+    },
     handover: {
       sellerConfirmed: { type: Boolean, default: false },
       buyerConfirmed: { type: Boolean, default: false },
       completedAt: { type: Date, default: null },
+      sellerPhone: { type: String, default: null },
+      buyerPhone: { type: String, default: null },
+      sellerPhoneSharedAt: { type: Date, default: null },
+      buyerPhoneSharedAt: { type: Date, default: null },
     },
   },
   {
@@ -89,7 +137,7 @@ const auctionSchema = new mongoose.Schema(
 
 // Virtual for checking if auction is actively accepting bids
 auctionSchema.virtual('isOpen').get(function () {
-  return this.status === 'active' && new Date(this.closingAt) > new Date();
+  return this.status === 'active' && !this.closedEarly && new Date(this.closingAt) > new Date();
 });
 
 const Auction = mongoose.model('Auction', auctionSchema);
