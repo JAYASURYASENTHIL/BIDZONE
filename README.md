@@ -1,37 +1,56 @@
-# 🏷️ BIDZONE — Campus Bidding Marketplace
+# 🏷️ BIDZONE — Campus Auction Marketplace
 
-A full-stack campus auction platform where students can **buy and sell items** through a bidding system. Built with the MERN stack.
+A full-stack campus auction platform where students can **buy and sell second-hand items** through a real-time bidding system. Built with the MERN stack.
 
 ---
 
-## 🚀 What's Built So Far
+## 🚀 Features & What's Built
 
-### ✅ Phase 1 — Backend Authentication Foundation (Complete)
+### ✅ Phase 1: Authentication & Security Foundation
+- 📝 **Student Signup & Login** with password strength validation
+- 🔐 Passwords hashed using **bcrypt (12 rounds)**, hidden from all API queries
+- 🍪 **Server-managed sessions** in MongoDB Atlas with `httpOnly`, `sameSite`, and session regeneration
+- 🛡️ Security hardened with **Helmet**, rate limiting, and credentialed CORS
+- 👤 `/api/auth/me` profile determination on page load & across browser refreshes
 
-A production-grade authentication system for student accounts.
+### ✅ Phase 2: Full Marketplace & Auction Engine
+- 📦 **Auction Listings**:
+  - Categories: *Cycles, Calculators, Books, Electronics, Others*
+  - Condition grades: *Brand New, Like New, Good, Fair, Poor*
+  - Multiple photo uploads using **Multer** (stored in `server/uploads/`)
+  - Configurable starting prices, minimum increments, and closing deadlines
+- 🔍 **Explore & Search Catalog**:
+  - Live search by title & description
+  - Category filter pills & condition selectors
+  - Sort by: *Ending Soonest, Recently Listed, Price Low-to-High, Price High-to-Low*
+- ⏱️ **Live Countdown Timer**:
+  - Client-side countdown ticking in real-time
+  - Server-enforced closing times — client clock cannot bypass bidding deadlines
+- 🤖 **Automated Background Auction Closer**:
+  - Scans for expired auctions every 30 seconds
+  - If 0 bids $\rightarrow$ marks item as `unsold`
+  - If bids exist $\rightarrow$ transitions item to `pending_seller_decision` and notifies both seller and top bidder
 
-**Features:**
-- 📝 Student **Signup** with input validation and password strength checks
-- 🔐 **Login / Logout** with secure server-side session management
-- 👤 **Authenticated profile** (`/me` endpoint)
-- 🍪 Session stored in **MongoDB Atlas** — survives server restarts
-- 🛡️ Security hardened:
-  - Passwords hashed with **bcrypt (12 rounds)** — never stored in plain text
-  - **httpOnly** session cookies — JavaScript can't steal them
-  - **Rate limiting** — max 10 login attempts per 15 minutes
-  - **Helmet** security headers on every response
-  - **Credentialed CORS** — exact frontend origin only
-  - Generic error messages — never reveals if an email exists
+### ✅ Phase 3: Bidding & Real-Time Updates
+- 💰 **Bidding Engine**:
+  - Validates bid amounts ($ \ge $ starting price for first bid; $ \ge $ current bid + increment for subsequent bids)
+  - Prevents sellers from bidding on their own listings
+  - Optimistic concurrency protection
+  - Safe public bid history displaying student names and timestamps without exposing private IDs or emails
+- ⚡ **Real-Time WebSockets with Socket.IO**:
+  - Live bid broadcast to all active viewers of an auction without manual page refresh
 
-**API Endpoints:**
-
-| Method | Endpoint | Auth Required | Description |
-|--------|----------|:---:|-------------|
-| `GET` | `/` | ❌ | Health check |
-| `POST` | `/api/auth/signup` | ❌ | Register student account |
-| `POST` | `/api/auth/login` | ❌ | Log in |
-| `POST` | `/api/auth/logout` | ✅ | Log out and destroy session |
-| `GET` | `/api/auth/me` | ✅ | Get current user profile |
+### ✅ Phase 4: Seller Decision & Campus Handover
+- 🤝 **Dual-Party Campus Handover Workflow**:
+  - Seller approves or rejects the winning bid after the auction closes
+  - Status progression: `active` $\rightarrow$ `pending_seller_decision` $\rightarrow$ `handover_pending` $\rightarrow$ `completed`
+  - Both buyer and seller independently confirm physical item handover on campus
+- 📊 **Buyer & Seller Dashboards**:
+  - **Buyer**: Active leading bids, outbid alerts with quick re-bid, won items awaiting decision, and handovers in progress
+  - **Seller**: Active listings with cancellation, auctions requiring price approval/rejection, items awaiting handover, and completed sales history
+- 🔔 **In-App Notification Center**:
+  - Real-time notifications for outbid alerts, won auctions, seller decisions, and handover updates
+  - Browser notification permission opt-in
 
 ---
 
@@ -39,23 +58,55 @@ A production-grade authentication system for student accounts.
 
 ```
 BIDZONE/
-├── client/                    # React + Vite frontend
+├── client/                      # React + Vite frontend
 │   └── src/
-├── server/                    # Node.js + Express backend
+│       ├── api/api.js           # Central API fetch wrapper with credentials
+│       ├── components/
+│       │   ├── Navbar.jsx       # Header with search, nav links, notification badge
+│       │   ├── AppShell.jsx     # Consistent layout wrapper
+│       │   ├── AuctionCard.jsx  # Card with photos, price, countdown, and status
+│       │   ├── CountdownTimer.jsx # Live ticking timer component
+│       │   ├── StatusBadge.jsx  # Color-coded auction state badge
+│       │   └── ProtectedRoute.jsx
+│       ├── context/
+│       │   └── AuthContext.jsx  # Global user state & session hydration
+│       └── pages/
+│           ├── ExplorePage.jsx        # Marketplace homepage with search/filter/sort
+│           ├── AuctionDetailPage.jsx  # Gallery, live bidding box, and bid history
+│           ├── SellPage.jsx           # Listing creation form with image previews
+│           ├── BuyerDashboard.jsx     # My Bids & outbid recovery
+│           ├── SellerDashboard.jsx    # My Listings & price approvals
+│           ├── SalesHandoverPage.jsx  # Physical campus handover tracker
+│           ├── NotificationsPage.jsx  # In-app alerts & browser push opt-in
+│           ├── ProfilePage.jsx        # Student profile & account info
+│           ├── LoginPage.jsx
+│           └── SignupPage.jsx
+├── server/                      # Node.js + Express backend
 │   └── src/
 │       ├── config/
-│       │   └── db.js          # MongoDB Atlas connection
+│       │   ├── db.js            # MongoDB Atlas connection
+│       │   └── upload.js        # Multer disk storage configuration
 │       ├── models/
-│       │   └── User.js        # Student user model
-│       ├── middleware/
-│       │   ├── requireAuth.js # Route protection
-│       │   └── errorHandler.js
-│       ├── routes/
-│       │   └── authRoutes.js
+│       │   ├── User.js          # Student user model (bcrypt)
+│       │   ├── Auction.js       # Auction listing model
+│       │   ├── Bid.js           # Bid model with isLeading flag
+│       │   └── Notification.js  # Notification event model
 │       ├── controllers/
-│       │   └── authController.js
-│       ├── app.js             # Express app (session, CORS, security)
-│       └── server.js          # Entry point
+│       │   ├── authController.js
+│       │   ├── auctionController.js
+│       │   └── notificationController.js
+│       ├── routes/
+│       │   ├── authRoutes.js
+│       │   ├── auctionRoutes.js
+│       │   ├── dashboardRoutes.js
+│       │   └── notificationRoutes.js
+│       ├── services/
+│       │   └── auctionCloser.js # Background recurring job
+│       ├── middleware/
+│       │   ├── requireAuth.js
+│       │   └── errorHandler.js
+│       ├── app.js               # Express application setup
+│       └── server.js            # HTTP + Socket.IO server listener
 ├── .gitignore
 └── README.md
 ```
@@ -65,62 +116,30 @@ BIDZONE/
 ## 🛠️ Tech Stack
 
 | Layer | Technology |
-|-------|-----------|
-| Frontend | React 19, Vite |
-| Backend | Node.js, Express 5 |
-| Database | MongoDB Atlas |
-| ODM | Mongoose |
-| Auth | express-session + connect-mongo |
-| Security | bcrypt, helmet, express-rate-limit |
-| Validation | express-validator |
+|---|---|
+| **Frontend** | React 19, Vite, React Router 7, Socket.io-client, CSS Modules |
+| **Backend** | Node.js, Express 5, Socket.IO, Multer, Mongoose |
+| **Database** | MongoDB Atlas |
+| **Authentication** | express-session, connect-mongo, bcrypt |
+| **Security** | Helmet, express-rate-limit, express-validator, strict CORS |
 
 ---
 
-## ⚙️ Local Setup
+## ⚙️ Running Locally
 
-### 1. Clone the repo
-```bash
-git clone https://github.com/JAYASURYASENTHIL/BIDZONE.git
-cd BIDZONE
-```
-
-### 2. Server setup
+### 1. Start the Backend:
 ```bash
 cd server
-cp .env.example .env
-# Fill in your MongoDB Atlas URI and a strong SESSION_SECRET
-npm install
 npm run dev
 ```
 
-### 3. Client setup
+### 2. Start the Frontend:
 ```bash
 cd client
-npm install
 npm run dev
 ```
 
-### 4. Environment variables (`server/.env`)
-```env
-MONGO_URI=mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/bidding
-SESSION_SECRET=<random 64-char hex string>
-SESSION_COOKIE_NAME=campus.sid
-PORT=5000
-CLIENT_URL=http://localhost:5173
-NODE_ENV=development
-```
-
----
-
-## 🗺️ Roadmap
-
-- [x] Backend authentication (signup, login, logout, session)
-- [ ] Auction item listings (create, browse, search)
-- [ ] Bidding system (place bid, track highest bid)
-- [ ] Auction countdown timer
-- [ ] Buyer & Seller dashboards (React frontend)
-- [ ] Real-time bid updates (Socket.io)
-- [ ] Image uploads for items
+Open your browser at **http://localhost:5173**.
 
 ---
 
