@@ -4,12 +4,17 @@ import helmet from 'helmet';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 import authRoutes from './routes/authRoutes.js';
 import auctionRoutes from './routes/auctionRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import errorHandler from './middleware/errorHandler.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsDir = path.resolve(__dirname, '../uploads');
 
 const createApp = () => {
   const app = express();
@@ -37,7 +42,7 @@ const createApp = () => {
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // ── Static folder for uploaded photos ───────────────────────────────────────
-  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+  app.use('/uploads', express.static(uploadsDir));
 
   // ── Session — stored in MongoDB Atlas via connect-mongo ────────────────────
   app.use(
