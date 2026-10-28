@@ -95,6 +95,35 @@ export const auctionApi = {
       method: 'POST',
       body: JSON.stringify({ phone }),
     }),
+  setAutoBid: (id, maxAmount) =>
+    request(`/auctions/${id}/auto-bid`, {
+      method: 'POST',
+      body: JSON.stringify({ maxAmount }),
+    }),
+  getQuestions: (id) => request(`/auctions/${id}/questions`),
+  askQuestion: (id, question) =>
+    request(`/auctions/${id}/questions`, {
+      method: 'POST',
+      body: JSON.stringify({ question }),
+    }),
+  answerQuestion: (id, questionId, answer) =>
+    request(`/auctions/${id}/questions/${questionId}/answer`, {
+      method: 'POST',
+      body: JSON.stringify({ answer }),
+    }),
+};
+
+export const alertApi = {
+  list: () => request('/alerts'),
+  create: (data) =>
+    request('/alerts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  delete: (id) =>
+    request(`/alerts/${id}`, {
+      method: 'DELETE',
+    }),
 };
 
 export const dashboardApi = {

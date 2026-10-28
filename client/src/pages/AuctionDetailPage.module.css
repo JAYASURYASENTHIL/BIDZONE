@@ -608,3 +608,248 @@
   padding-top: 16px;
   border-top: 1px solid var(--border);
 }
+
+/* Anti-Sniping Extension Banner */
+.antiSnipeBanner {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #f59e0b;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: pulseSnipe 2s infinite ease-in-out;
+}
+
+@keyframes pulseSnipe {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
+  }
+}
+
+.antiSnipeIcon {
+  font-size: 24px;
+}
+
+.antiSnipeTitle {
+  color: #b45309;
+  font-weight: 700;
+  font-size: 14px;
+  margin: 0 0 2px 0;
+}
+
+.antiSnipeDesc {
+  color: #92400e;
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Automatic Proxy Bidding Box */
+.autoBidBox {
+  margin-top: 16px;
+  padding: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+}
+
+.autoBidHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.autoBidTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.autoBidActiveBadge {
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.autoBidDesc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin: 0 0 10px 0;
+}
+
+.autoBidForm {
+  display: flex;
+  gap: 8px;
+}
+
+.autoBidField {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+}
+
+/* Item Q&A Section */
+.qaCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.qaCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.qaHeading {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.qaSubtext {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.qaList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.qaItem {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.questionRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.qaAvatar {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.questionContent {
+  flex: 1;
+}
+
+.questionAuthorRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.questionAuthor {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.questionText {
+  font-size: 14px;
+  color: var(--text-main);
+  margin: 0;
+  font-weight: 500;
+}
+
+.answerRow {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(16, 185, 129, 0.05);
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.answerContent {
+  flex: 1;
+}
+
+.answerAuthorRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #047857;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.answerText {
+  font-size: 13px;
+  color: #065f46;
+  margin: 0;
+}
+
+.noAnswerPending {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.sellerReplyForm {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.sellerReplyInput {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+
+.askForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.askTextarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  resize: vertical;
+  min-height: 70px;
+  font-family: inherit;
+}
+

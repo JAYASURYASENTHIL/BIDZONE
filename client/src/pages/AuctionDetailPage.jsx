@@ -37,6 +37,32 @@ export default function AuctionDetailPage() {
   const [phoneSubmitting, setPhoneSubmitting] = useState(false);
   const [phoneModalDismissed, setPhoneModalDismissed] = useState(false);
 
+  // Anti-Sniping Alert State
+  const [antiSnipeAlert, setAntiSnipeAlert] = useState(false);
+
+  // Auto-Bidding (Proxy Bidding) State
+  const [autoBidAmount, setAutoBidAmount] = useState('');
+  const [submittingAutoBid, setSubmittingAutoBid] = useState(false);
+  const [autoBidMsg, setAutoBidMsg] = useState('');
+  const [autoBidErr, setAutoBidErr] = useState('');
+
+  // Item Q&A State
+  const [questions, setQuestions] = useState([]);
+  const [questionInput, setQuestionInput] = useState('');
+  const [askingQuestion, setAskingQuestion] = useState(false);
+  const [qaError, setQaError] = useState('');
+  const [replyInputs, setReplyInputs] = useState({});
+  const [answeringId, setAnsweringId] = useState(null);
+
+  const fetchQuestions = () => {
+    auctionApi
+      .getQuestions(id)
+      .then((res) => {
+        setQuestions(res.questions || []);
+      })
+      .catch(() => {});
+  };
+
   const fetchAuction = () => {
     auctionApi
       .getById(id)
@@ -57,6 +83,7 @@ export default function AuctionDetailPage() {
 
   useEffect(() => {
     fetchAuction();
+    fetchQuestions();
 
     const socket = io('/', { withCredentials: true });
     socket.emit('join:auction', id);
@@ -72,6 +99,35 @@ export default function AuctionDetailPage() {
     socket.on('auction:status', (data) => {
       if (data.auctionId === id) {
         setAuction((prev) => (prev ? { ...prev, ...data } : prev));
+      }
+    });
+
+    socket.on('auction:extended', (data) => {
+      if (data.auctionId === id) {
+        setAuction((prev) =>
+          prev
+            ? {
+                ...prev,
+                closingAt: data.newClosingAt,
+                extendedByAntiSnipe: true,
+                extensionCount: data.extensionCount,
+              }
+            : prev
+        );
+        setAntiSnipeAlert(true);
+        setTimeout(() => setAntiSnipeAlert(false), 8000);
+      }
+    });
+
+    socket.on('question:new', (newQ) => {
+      if (newQ.auction === id) {
+        setQuestions((prev) => [newQ, ...prev.filter((q) => q._id !== newQ._id)]);
+      }
+    });
+
+    socket.on('question:answered', (updatedQ) => {
+      if (updatedQ.auction === id) {
+        setQuestions((prev) => prev.map((q) => (q._id === updatedQ._id ? updatedQ : q)));
       }
     });
 
@@ -257,6 +313,79 @@ export default function AuctionDetailPage() {
     }
   };
 
+  const handleSetAutoBid = async (e) => {
+    e.preventDefault();
+    setAutoBidErr('');
+    setAutoBidMsg('');
+
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    const val = Number(autoBidAmount);
+    if (!val || val < minNextBid) {
+      setAutoBidErr(`Auto-bid ceiling must be at least ₹${minNextBid}`);
+      return;
+    }
+
+    if (auction.maxPrice && val > auction.maxPrice) {
+      setAutoBidErr(`Auto-bid ceiling cannot exceed max price of ₹${auction.maxPrice}`);
+      return;
+    }
+
+    setSubmittingAutoBid(true);
+    try {
+      const res = await auctionApi.setAutoBid(id, val);
+      setAutoBidMsg(res.message || `Auto-bid active up to ₹${val}!`);
+      setAutoBidAmount('');
+      fetchAuction();
+    } catch (err) {
+      setAutoBidErr(err.message || 'Failed to configure auto-bid.');
+    } finally {
+      setSubmittingAutoBid(false);
+    }
+  };
+
+  const handleAskQuestion = async (e) => {
+    e.preventDefault();
+    setQaError('');
+
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    if (!questionInput.trim()) return;
+
+    setAskingQuestion(true);
+    try {
+      const res = await auctionApi.askQuestion(id, questionInput.trim());
+      setQuestionInput('');
+      setQuestions((prev) => [res.question, ...prev]);
+    } catch (err) {
+      setQaError(err.message || 'Failed to submit question.');
+    } finally {
+      setAskingQuestion(false);
+    }
+  };
+
+  const handleAnswerQuestion = async (qId) => {
+    const text = replyInputs[qId];
+    if (!text || !text.trim()) return;
+
+    setAnsweringId(qId);
+    try {
+      const res = await auctionApi.answerQuestion(id, qId, text.trim());
+      setQuestions((prev) => prev.map((q) => (q._id === qId ? res.question : q)));
+      setReplyInputs((prev) => ({ ...prev, [qId]: '' }));
+    } catch (err) {
+      alert(err.message || 'Failed to submit answer.');
+    } finally {
+      setAnsweringId(null);
+    }
+  };
+
   const images =
     auction.images && auction.images.length > 0
       ? auction.images
@@ -356,6 +485,115 @@ export default function AuctionDetailPage() {
               </div>
             </div>
           </div>
+
+          {/* Item Q&A Section */}
+          <div className={styles.qaCard}>
+            <div className={styles.qaCardHeader}>
+              <h2 className={styles.qaHeading}>
+                💬 Questions Before Bidding ({questions.length})
+              </h2>
+            </div>
+            <p className={styles.qaSubtext}>
+              Buyers can ask specific details before bidding (e.g. brakes, markings, display). Seller answers are public to prevent repeat questions.
+            </p>
+
+            {qaError && <div className={styles.bidAlertError} style={{ marginBottom: '14px' }}>{qaError}</div>}
+
+            <div className={styles.qaList}>
+              {questions.length === 0 ? (
+                <p style={{ fontSize: '13px', color: 'var(--text-muted)', fontStyle: 'italic', margin: 0 }}>
+                  No questions asked yet. Be the first to ask the seller before bidding!
+                </p>
+              ) : (
+                questions.map((q) => (
+                  <div key={q._id} className={styles.qaItem}>
+                    <div className={styles.questionRow}>
+                      <span className={styles.qaAvatar}>🙋</span>
+                      <div className={styles.questionContent}>
+                        <div className={styles.questionAuthorRow}>
+                          <span className={styles.questionAuthor}>{q.asker?.name || 'Campus Student'}</span>
+                          <span>{new Date(q.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                        <p className={styles.questionText}>{q.question}</p>
+                      </div>
+                    </div>
+
+                    {q.answer ? (
+                      <div className={styles.answerRow}>
+                        <span className={styles.qaAvatar}>💬</span>
+                        <div className={styles.answerContent}>
+                          <div className={styles.answerAuthorRow}>
+                            <span>👑 Seller Answer</span>
+                            <span>{new Date(q.answeredAt || q.updatedAt).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                          <p className={styles.answerText}>{q.answer}</p>
+                        </div>
+                      </div>
+                    ) : isSeller ? (
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          handleAnswerQuestion(q._id);
+                        }}
+                        className={styles.sellerReplyForm}
+                      >
+                        <input
+                          type="text"
+                          placeholder="Write a public answer for all bidders..."
+                          value={replyInputs[q._id] || ''}
+                          onChange={(e) =>
+                            setReplyInputs((prev) => ({ ...prev, [q._id]: e.target.value }))
+                          }
+                          className={styles.sellerReplyInput}
+                          required
+                          disabled={answeringId === q._id}
+                        />
+                        <button
+                          type="submit"
+                          className="btn btn-primary"
+                          style={{ fontSize: '12px', padding: '6px 12px' }}
+                          disabled={answeringId === q._id || !replyInputs[q._id]?.trim()}
+                        >
+                          {answeringId === q._id ? 'Answering...' : 'Reply'}
+                        </button>
+                      </form>
+                    ) : (
+                      <p className={styles.noAnswerPending}>⏳ Awaiting seller response...</p>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Buyer Question Submission Box */}
+            {!isSeller && (
+              <form onSubmit={handleAskQuestion} className={styles.askForm}>
+                <label style={{ fontSize: '13px', fontWeight: '600', color: 'var(--text-main)' }}>
+                  Ask the Seller a Question:
+                </label>
+                <textarea
+                  placeholder="e.g. Does the brake cable need replacement? Any missing accessories?"
+                  value={questionInput}
+                  onChange={(e) => setQuestionInput(e.target.value)}
+                  className={styles.askTextarea}
+                  rows={2}
+                  maxLength={500}
+                  required
+                  disabled={askingQuestion}
+                />
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button
+                    type="submit"
+                    className="btn btn-secondary"
+                    style={{ fontSize: '13px' }}
+                    disabled={askingQuestion || !questionInput.trim()}
+                  >
+                    {askingQuestion ? 'Submitting...' : 'Post Question'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         </div>
 
         {/* Right Column: Bidding Box & Bid History */}
@@ -368,6 +606,19 @@ export default function AuctionDetailPage() {
               </span>
               <CountdownTimer closingAt={auction.closingAt} status={auction.status} />
             </div>
+
+            {/* Anti-Sniping Extension Banner */}
+            {(auction.extendedByAntiSnipe || antiSnipeAlert) && (
+              <div className={styles.antiSnipeBanner}>
+                <span className={styles.antiSnipeIcon}>⏱️</span>
+                <div>
+                  <div className={styles.antiSnipeTitle}>Anti-Sniping Active (+60s Extension)!</div>
+                  <p className={styles.antiSnipeDesc}>
+                    A bid was placed in the last 30 seconds. The auction has been extended by 60 seconds to prevent last-second sniping!
+                  </p>
+                </div>
+              </div>
+            )}
 
             <h1 className={styles.itemTitle}>{auction.title}</h1>
 
@@ -465,7 +716,8 @@ export default function AuctionDetailPage() {
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handlePlaceBid} className={styles.bidForm}>
+                <>
+                  <form onSubmit={handlePlaceBid} className={styles.bidForm}>
                   {bidError && <div className={styles.bidAlertError}>{bidError}</div>}
                   {bidSuccess && <div className={styles.bidAlertSuccess}>{bidSuccess}</div>}
 
@@ -503,7 +755,51 @@ export default function AuctionDetailPage() {
                     )}
                   </div>
                 </form>
-              )
+
+                {/* Automatic Proxy Bidding Feature */}
+                <div className={styles.autoBidBox}>
+                  <div className={styles.autoBidHeader}>
+                    <span className={styles.autoBidTitle}>
+                      🤖 Automatic Bidding (Proxy)
+                    </span>
+                    {auction.myAutoBidMax && (
+                      <span className={styles.autoBidActiveBadge}>
+                        Active Ceiling: ₹{auction.myAutoBidMax}
+                      </span>
+                    )}
+                  </div>
+                  <p className={styles.autoBidDesc}>
+                    Set your maximum budget. BIDZONE will automatically place the minimum counter-bids to keep you in the lead up to your limit.
+                  </p>
+
+                  {autoBidErr && <div className={styles.bidAlertError} style={{ marginBottom: '8px' }}>{autoBidErr}</div>}
+                  {autoBidMsg && <div className={styles.bidAlertSuccess} style={{ marginBottom: '8px' }}>{autoBidMsg}</div>}
+
+                  <form onSubmit={handleSetAutoBid} className={styles.autoBidForm}>
+                    <input
+                      type="number"
+                      placeholder={`Max ceiling (e.g. ₹${(auction.currentBid || auction.startingPrice) + auction.minIncrement * 3})`}
+                      value={autoBidAmount}
+                      onChange={(e) => setAutoBidAmount(e.target.value)}
+                      min={minNextBid}
+                      max={auction.maxPrice || undefined}
+                      step={auction.minIncrement}
+                      className={styles.autoBidField}
+                      required
+                      disabled={submittingAutoBid}
+                    />
+                    <button
+                      type="submit"
+                      className="btn btn-secondary"
+                      style={{ fontSize: '12px', whiteSpace: 'nowrap' }}
+                      disabled={submittingAutoBid}
+                    >
+                      {submittingAutoBid ? 'Setting...' : 'Set Auto-Bid'}
+                    </button>
+                  </form>
+                </div>
+              </>
+            )
             ) : (
               <div className={styles.closedNotice}>
                 <p>
