@@ -232,10 +232,25 @@ export const getAuctionById = async (req, res, next) => {
   }
 };
 
+// ── In-memory per-auction bid lock ─────────────────────────────────────────
+// Prevents two bids on the same auction from racing through validation at the
+// same time on this process. Simple and effective for a single-server deploy.
+const _bidLocks = new Set();
+
 // ── POST /api/auctions/:id/bids (Place a bid) ──────────────────────────────
 export const placeBid = async (req, res, next) => {
+  const { id } = req.params;
+
+  // If a bid for this auction is already in-flight, reject immediately.
+  if (_bidLocks.has(id)) {
+    return res.status(429).json({
+      success: false,
+      message: 'Another bid is being processed for this auction. Please try again in a moment.',
+    });
+  }
+  _bidLocks.add(id); // Lock this auction for the duration of this request.
+
   try {
-    const { id } = req.params;
     const { amount } = req.body;
     const bidderId = req.session.userId;
 
@@ -421,6 +436,9 @@ export const placeBid = async (req, res, next) => {
     }
   } catch (err) {
     next(err);
+  } finally {
+    // Always release the lock — even if an error was thrown.
+    _bidLocks.delete(id);
   }
 };
 
