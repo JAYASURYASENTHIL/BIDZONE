@@ -6,23 +6,25 @@ import requireAuth from '../middleware/requireAuth.js';
 
 const router = Router();
 
-// ─── Rate limiter: 10 login attempts per 15 minutes per IP ─────────────────
+const isDev = process.env.NODE_ENV !== 'production';
+
+// ─── Rate limiter: login — 10 attempts/15 min (prod), 100 (dev) ────────────
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10,
+  windowMs: 15 * 60 * 1000,
+  max: isDev ? 100 : 10,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     success: false,
     message: 'Too many login attempts. Please try again in 15 minutes.',
   },
-  skipSuccessfulRequests: true, // only count failed attempts
+  skipSuccessfulRequests: true,
 });
 
-// ─── Signup limiter: 5 accounts per hour per IP ─────────────────────────────
+// ─── Signup limiter: 5/hr (prod), 50/hr (dev) ───────────────────────────────
 const signupLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5,
+  windowMs: 60 * 60 * 1000,
+  max: isDev ? 50 : 5,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
